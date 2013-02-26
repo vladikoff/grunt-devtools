@@ -1,0 +1,35 @@
+* {
+  -webkit-box-sizing: border-box;
+}
+
+body {
+  font-family: Lucida Grande, sans-serif;
+}
+
+h2 {
+  position: relative;
+  height: 18px;
+  padding: 1px 10px 6px 10px;
+  white-space: nowrap;
+  margin-top: 1px;
+  color: rgb(92, 110, 129);
+  font-weight: bold;
+  text-shadow: rgba(255, 255, 255, 0.75) 0 1px 0;
+}
+
+#connection {
+  width: 25px;
+  height: 25px;
+}
+
+#reconnect {
+  display: none;
+}
+
+.offline #reconnect {
+  display: block;
+}
+
+.online {
+
+}
