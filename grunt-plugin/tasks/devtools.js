@@ -2,7 +2,7 @@
 
 module.exports = function(grunt) {
 
-  grunt.registerMultiTask('devtools', 'Runs a server for devtools', function() {
+  grunt.registerTask('devtools', 'Runs a server for devtools', function() {
 
     this.async();
     var WebSocketServer = require('websocket').server;
