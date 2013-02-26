@@ -20,6 +20,9 @@ h2 {
 #connection {
   width: 25px;
   height: 25px;
+  position: absolute;
+  top: 35px;
+  right: 35px;
 }
 
 #reconnect {
@@ -28,6 +31,10 @@ h2 {
 
 .offline #reconnect {
   display: block;
+}
+
+.offline #tools {
+  display: none;
 }
 
 .online {

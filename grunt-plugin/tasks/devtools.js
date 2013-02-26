@@ -2,9 +2,6 @@
 
 module.exports = function(grunt) {
 
-  // Please see the Grunt documentation for more information regarding task
-  // creation: http://gruntjs.com/creating-tasks
-
   grunt.registerMultiTask('devtools', 'Runs a server for devtools', function() {
 
     this.async();
@@ -31,12 +28,6 @@ module.exports = function(grunt) {
       autoAcceptConnections: false
     });
 
-    function runTask() {
-      console.log('exec wat');
-
-
-    }
-
     wsServer.on('request', function(request) {
       var connection = request.accept('echo-protocol', request.origin);
       console.log((new Date()) + ' Connection accepted.');
@@ -48,17 +39,19 @@ module.exports = function(grunt) {
           }
           else if (Object.keys(grunt.config.data).indexOf(msg) > -1) {
             console.log('found task ' + msg);
-            exec('grunt ' + msg, function (error, stdout, stderr) {
+            exec('grunt ' + msg + ' -no-color', function (error, stdout, stderr) {
               if(error) {
                 connection.sendUTF(error);
+                console.log(error);
               } else {
-                connection.sendUTF(stdout);
+                console.log(stdout);
+                connection.send(stdout);
               }
             });
           }
         }
       });
-      connection.on('close', function(reasonCode, description) {
+      connection.on('close', function() {
         console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
       });
     });
