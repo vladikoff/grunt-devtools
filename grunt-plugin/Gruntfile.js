@@ -28,6 +28,13 @@ module.exports = function(grunt) {
       tests: ['tmp'],
     },
 
+    watch: {
+      tests: {
+        files: 'test/*.js',
+        tasks: ['jshint']
+      }
+    },
+
     // Configuration to be run (and then tested).
     devtools: {
       default_options: {
@@ -62,10 +69,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Whenever the "test" task is run, first clean the "tmp" dir, then run this
   // plugin's task(s), then test the result.
   grunt.registerTask('test', ['clean', 'devtools', 'nodeunit']);
+  grunt.registerTask('mycleanalias', ['clean']);
+  grunt.registerTask('dev', ['watch']);
 
   // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'test']);

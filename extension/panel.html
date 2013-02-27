@@ -4,16 +4,30 @@
     <link rel='stylesheet' href='css/devtools.css'>
   </head>
   <body>
-    <h1>Grunt DevTools</h1>
-    <progress id='connection' value='0'></progress>
-    <button id='reconnect'>Reconnect</button>
-    <hr/>
+    <header id='projects'>
+      <h2>Project</h2>
+      <div id='placeProjects'></div>
+      <progress id='connection' value='0'></progress>
+    </header>
     <div id='tools'>
-      <h2>Tasks</h2>
-      <section id='tasks'></section>
-      <h2>Output</h2>
-      <section id='output'></section>
+      <section id='tasks'>
+        <header><h2>Alias Tasks</h2></header>
+        <div id='placeAliasTasks'></div>
+        <header><h2>Tasks</h2></header>
+        <div id='placeTasks'></div>
+      </section>
+      <section id='output'>
+        <header><h2>Output</h2></header>
+        <div id='placeOutput'></div>
+      </section>
     </div>
+    <section id='notice'>
+      <p>
+        <img src='img/icon128.png' alt='Grunt'/><br/>
+        <strong>No projects detected.</strong>
+      </p>
+      <p><small>Is <code>grunt devtools</code> running?</small></p>
+    </section>
     <script src='js/vendor/jquery.min.js'></script>
     <script src='js/vendor/lodash.min.js'></script>
     <script src='js/devtools.js'></script>

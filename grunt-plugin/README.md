@@ -87,3 +87,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 _(Nothing yet)_
+
+
+## TODO
+
+* Test Windows and other OS
