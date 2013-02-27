@@ -48,3 +48,7 @@ Run `grunt devtools` to get things rolling!
 (this means if you like to work on more than 5 projects at a time, you will need to turn off the task)
 
 * Background tasks are work in progress.
+
+### Release History
+
+* 0.1.0-alpha3 - Adds `Gruntfile.coffee` support

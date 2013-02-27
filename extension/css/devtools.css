@@ -81,6 +81,8 @@ pre {
   font-size: 11px;
   margin: 1px 0px 1px 0px;
   color: rgb(92, 110, 129);
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 button {
@@ -115,7 +117,7 @@ button {
 }
 
 #placeOutput {
-  padding-left: 10px;
+  padding: 0 0 40px 10px;
 }
 
 #placeProjects {

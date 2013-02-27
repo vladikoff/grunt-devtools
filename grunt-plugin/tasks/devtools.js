@@ -29,10 +29,10 @@ module.exports = function (grunt) {
       projectPort = port;
       if (projectPort) {
       server.listen(port, function () {
-        console.log("Grunt Devtools is ready! Proceed to the Chrome extension.");
+        grunt.log.ok("Grunt Devtools is ready! Proceed to the Chrome extension.");
       });
       } else {
-        console.log("You're running too many Grunt Devtools, please close one.");
+        grunt.fail.warn("You're running too many Grunt Devtools, please close one.");
       }
     });
 
@@ -113,18 +113,26 @@ module.exports = function (grunt) {
       var l,
         aliasTasks = [];
 
-      // read the Home.md of the wiki, extract the section links
-      var lines = fs.readFileSync('Gruntfile.js').toString().split('\n');
-      for (l in lines) {
-        var line = lines[l].replace(/ /g, '');
-        if (line.indexOf('grunt.registerTask') === 0) {
-          aliasTasks.push(line.split(/'/)[1]);
-        }
-
+      var gruntFile = 'Gruntfile.js',
+        gruntFileCoffee = 'Gruntfile.coffee';
+      // check if Gruntfile.coffee
+      if (grunt.file.exists(gruntFileCoffee)) {
+        gruntFile = gruntFileCoffee;
       }
+      // make sure Gruntfile exists, otherwise exit
+      if (grunt.file.exists(gruntFile)) {
+        // TODO: add grunt read file here?
+        var lines = fs.readFileSync(gruntFile).toString().split('\n');
+        for (l in lines) {
+          var line = lines[l].replace(/ /g, '');
+          if (line.indexOf('grunt.registerTask') === 0) {
+            aliasTasks.push(line.split(/'/)[1]);
+          }
+        }
       return aliasTasks;
+      } else {
+        grunt.fail.warn('Cannot find Gruntfile.js or Gruntfile.coffee');
+      }
     }
-
-
   });
 };

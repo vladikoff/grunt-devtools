@@ -1,7 +1,7 @@
 {
   "name": "grunt-devtools",
   "description": "Experimental! Grunt integration with Chrome Dev Tools",
-  "version": "0.1.0-alpha",
+  "version": "0.1.0-alpha3",
   "homepage": "https://github.com/vladikoff/grunt-devtools",
   "author": {
     "name": "vladikoff",
