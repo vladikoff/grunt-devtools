@@ -25,11 +25,15 @@ module.exports = function (grunt) {
 
     // TODO: update this
     var projectPort = 61750;
-    portscanner.findAPortNotInUse(projectPort, projectPort + 5, 'localhost', function (error, port) {
+    portscanner.findAPortNotInUse(projectPort, projectPort + 4, 'localhost', function (error, port) {
       projectPort = port;
+      if (projectPort) {
       server.listen(port, function () {
         console.log("Grunt Devtools is ready! Proceed to the Chrome extension.");
       });
+      } else {
+        console.log("You're running too many Grunt Devtools, please close one.");
+      }
     });
 
     var wsServer = new WebSocketServer({
@@ -66,6 +70,7 @@ module.exports = function (grunt) {
               if (data) {
                 connection.send(data.toString());
               }
+              connection.sendUTF(JSON.stringify({ action: 'done'}));
             });
             watcher.stderr.on('data', function (data) {
               if (data) {
