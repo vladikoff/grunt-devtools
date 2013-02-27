@@ -63,7 +63,7 @@ function handleSocketMessage(event) {
       setProject(projects.length - 1);
     }
     else if (data && data.action === "completed") {
-      enableActivity();
+      //enableActivity();
     }
   } catch (e) {
     // new task
@@ -147,7 +147,7 @@ connect();
 // execute task
 $tasks.on('click', 'button', function () {
   currentProject.socket.send($(this).val());
-  disableActivity();
+  //disableActivity();
 });
 
 // switch projects
