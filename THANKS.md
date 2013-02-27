@@ -4,7 +4,7 @@ changes. A list of these people is included below.
 
 Thanks to:
 
-* Mike Taylor `https://github.com/miketaylr`
-* coldhead `https://github.com/coldhead`
-* Alex Tucker `https://github.com/alextucker`
-* Tim Branyen `https://github.com/tbranyen`
+* Mike Taylor [https://github.com/miketaylr](https://github.com/miketaylr)
+* coldhead [https://github.com/coldhead](https://github.com/coldhead)
+* Alex Tucker [https://github.com/alextucker](https://github.com/alextucker)
+* Tim Branyen [https://github.com/tbranyen](https://github.com/tbranyen)
