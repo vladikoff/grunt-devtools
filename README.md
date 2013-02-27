@@ -15,6 +15,8 @@ Load unpacked extension from the `extension` folder.
 
 Locally install the plugin using `npm install [folder]/grunt-plugin`
 
+Add `grunt.loadNpmTasks('grunt-devtools');` to your `Gruntfile`
+
 Run `grunt devtools` to get things rolling!
 
 
