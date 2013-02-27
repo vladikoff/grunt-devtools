@@ -3,6 +3,19 @@ grunt-devtools (preview)
 
 grunt-devtools
 
+## Quick Setup
+
+* Download the [Grunt Devtools](https://chrome.google.com/webstore/detail/grunt-devtools/fbiodiodggnlakggeeckkjccjhhjndnb?hl=en)
+add-on for Chrome Dev Tools from the Chrome Web Store.
+
+* `npm install grunt-devtools` in your grunt project
+
+* Add `grunt.loadNpmTasks('grunt-devtools');` to your `Gruntfile`
+
+* run `grunt devtools`
+
+* open Chrome Dev tools, find the Grunt tab. Your grunt tasks should now be accessible from Chrome.
+
 
 
 ## Dev Setup
