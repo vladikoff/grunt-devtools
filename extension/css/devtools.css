@@ -116,6 +116,7 @@ pre {
   color: rgb(92, 110, 129);
   white-space: pre-wrap;
   word-wrap: break-word;
+  word-break: break-all;
 }
 
 button {
