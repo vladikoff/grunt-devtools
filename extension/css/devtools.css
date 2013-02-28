@@ -87,22 +87,29 @@ h2, label {
 }
 
 #tasks li .b {
+  text-align: center;
   display: none;
   position: absolute;
-  background: grey;
-  color: white;
+  background: rgba(92, 110, 129, 0.1);
   right: 15px;
   padding: 2px 4px;
-  top: 0;
+  top: 3px;
   font-size: 10px;
   width: auto;
   border-radius: 15px;
-  border: 1px solid grey;
+  border: 1px solid rgba(92, 110, 129, 0.1);
   height: auto;
+  font-family: Arial, monospace;
+  color: white;
+}
+#tasks li .b:hover {
+  color: white;
 }
 
+
 #tasks li .b.b-kill {
-  background: red;
+  opacity: 0.7;
+  background: rgba(92, 110, 129, 0.9);
 }
 
 #tasks li .b.b-bg {
@@ -161,6 +168,12 @@ button {
 #tasks button:hover {
   background: rgba(56, 121, 217, 0.1);
   color: rgb(92, 110, 129);
+}
+
+#tasks li .b.b-kill:hover {
+  background-color: red;
+  border-color: red;
+  opacity: 1;
 }
 
 #notice p {
