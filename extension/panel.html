@@ -11,19 +11,19 @@
     <div id='tools'>
       <section id='tasks'>
         <div id='backgroundTasks'>
-          <header><h2 >Background Tasks</h2></header>
-          <div id='placeBackgroundTasks'></div>
+          <header><h2>Background Tasks</h2></header>
+          <ul id='placeBackgroundTasks'></ul>
         </div>
+
         <header><h2>Alias Tasks</h2></header>
-        <div id='placeAliasTasks'></div>
+        <ul id='placeAliasTasks'></ul>
+
         <header><h2>Tasks</h2></header>
-        <div id='placeTasks'></div>
+        <ul id='placeTasks'></ul>
       </section>
       <section id='output'>
         <header>
           <h2>Output</h2>
-          <button id='sendBackground'>Send task to background</button>
-          <button id='killTask'>Kill Task</button>
         </header>
         <div id='placeOutput'></div>
       </section>
@@ -31,10 +31,12 @@
     <section id='notice'>
       <p>
         <img src='img/icon128.png' alt='Grunt'/><br/>
+        <small>Grunt Devtools <span id='toolsVersion'></span></small><br/>
         <strong>No projects detected.</strong>
       </p>
       <p><small>Is <code>grunt devtools</code> running?</small></p>
     </section>
+    <script src='js/runtime.js'></script>
     <script src='js/vendor/jquery.min.js'></script>
     <script src='js/vendor/lodash.min.js'></script>
     <script src='js/devtools.js'></script>

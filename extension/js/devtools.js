@@ -1,5 +1,10 @@
 var socket;
 
+// TODO: organize templates
+var projectListTpl = "<% _.each(projects, function(project, i) { %><button value='<%= i %>'><%= project.name %></button><% }); %>";
+var taskListTpl = "<% _.each(buttons, function(name) { %> <li><button class='task' value='<%= name %>'><%= name %></button><button title='Add to Background Tasks' class='b b-bg'>B</button><button title='Kill Task' class='b b-kill'>X</button></li><% }); %>";
+var bgTasksTpl = "<% _.each(tasks, function(task) { %> <li><button value='<%= task.name %>'><%= task.name %></button><button title='Kill Task' class='b b-kill' data-pid='<%= task.pid %>'>X</button></li><% }); %>";
+
 var $output = $("#placeOutput");
 var $body = $('body');
 var $tasks = $('#tasks');
@@ -46,11 +51,11 @@ function connect(port) {
 
 function handleSocketOpen(e) {
   $body.removeClass('offline').addClass('online');
-  socket.send('connect');
+  socket.send('handleSocketOpen');
 }
 
 function handleSocketMessage(event) {
-  // TODO: please fix this later
+  // TODO: please fix this later, this will handle most actions via JSON
   try {
     var data = JSON.parse(event.data);
     if (data && data.project) {
@@ -68,10 +73,14 @@ function handleSocketMessage(event) {
       updateProjectList();
       // set to current to latest, if not running
       setProject(projects.length - 1);
-
     }
+    // process done
     else if (data && data.action === 'done') {
       enableActivity();
+    }
+    // process started
+    else if (data && data.action === 'start') {
+      currentTask = {name: data.name, pid: data.pid};
     }
   } catch (e) {
     // new task
@@ -89,7 +98,6 @@ function handleSocketMessage(event) {
  * @param e event
  */
 function handleSocketClose(e) {
-  //console.log(projects);
   // port that was just closed
   var closedPort = parseInt(e.currentTarget.URL.split(':')[2].replace(/\D/g, ''));
   // remove this project
@@ -126,8 +134,20 @@ function handleSocketError() {
 
 function updateProjectList() {
   // update project list
-  var projectListTpl = "<% _.each(projects, function(project, i) { %> <button value='<%= i %>'><%= project.name %></button><% }); %>";
   $projects.html(_.template(projectListTpl, projects));
+}
+
+function updateTaskList() {
+  // set the tasks
+  $regularTasks.html(_.template(taskListTpl, {buttons:currentProject.tasks}));
+  $aliasTasks.html(_.template(taskListTpl, {buttons:currentProject.alias}));
+
+  if(currentProject.backgroundTasks.length > 0) {
+    $bgSection.addClass('show');
+    $bgTasks.html(_.template(bgTasksTpl, {tasks: currentProject.backgroundTasks}));
+  } else {
+    $bgSection.removeClass('show');
+  }
 }
 
 function setProject(idx) {
@@ -143,16 +163,7 @@ function setProject(idx) {
     $output.html('');
     // update task lists for this project
     if (currentProject) {
-      // set the tasks
-      var taskListTpl = "<% _.each(buttons, function(name) { %> <button value='<%= name %>'><%= name %></button><% }); %>";
-      $regularTasks.html(_.template(taskListTpl, {buttons:currentProject.tasks}));
-      $aliasTasks.html(_.template(taskListTpl, {buttons:currentProject.alias}));
-      if(currentProject.backgroundTasks.length > 0) {
-        $bgSection.addClass('show');
-        $bgTasks.html(_.template(taskListTpl, {buttons:currentProject.backgroundTasks}));
-      } else {
-        $bgSection.removeClass('show');
-      }
+      updateTaskList();
     }
   }
 }
@@ -167,9 +178,10 @@ connect();
  */
 
 // execute task
-$tasks.on('click', 'button', function () {
+$tasks.on('click', '.task', function () {
+  $tasks.find('li').removeClass('active-task');
+  $(this).parent().addClass('active-task');
   currentProject.socket.send($(this).val());
-  currentTask = {name:$(this).val(), output: ''};
   disableActivity();
 });
 
@@ -180,29 +192,46 @@ $projects.on('click', 'button', function () {
 });
 
 // send task to background
-$('#sendBackground').on('click',function () {
-  //console.log('sendingToBackground');
+$tasks.on('click', '.b-bg',function () {
+  // TODO: there will be a problem here if socket is slow
   if(currentTask) {
     currentProject.backgroundTasks.push(currentTask);
+    currentTask = null;
+    $output.html('');
+    updateTaskList();
+    enableActivity();
   }
-  connect(currentProject.port);
-  enableActivity();
 });
 
 // kill current task
-$('#killTask').on('click',function () {
-  //console.log('killingTask');
-});
+$tasks.on('click','.b-kill',function () {
+  var btn = $(this),
+    // get pid info from current task
+    taskInfo = currentTask;
 
+  // if there's a pid, use it instead
+  if (btn.data('pid')) {
+    taskInfo = {name: btn.val(), pid: btn.data('pid')};
+    // TODO: validate this?
+    currentProject.backgroundTasks = _.reject(currentProject.backgroundTasks, function (task) {
+      return task.pid === btn.data('pid');
+    });
+    updateTaskList();
+  }
+  currentProject.socket.send(JSON.stringify({
+    action: 'killTask',
+    task: taskInfo
+  }));
+});
 
 function disableActivity() {
   running = true;
   $body.addClass('running');
-  $('#tasks button, #projects button').prop('disabled',true);
+  $('#tasks .task, #projects .task').prop('disabled',true);
 }
 
 function enableActivity() {
   running = false;
   $body.removeClass('running');
-  $('#tasks button, #projects button').prop('disabled',false);
+  $('#tasks .task, #projects .task').prop('disabled',false);
 }

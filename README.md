@@ -42,13 +42,16 @@ Run `grunt devtools` to get things rolling!
 
 ![](http://v14d.com/i/512db0deea5fd.jpg)
 
-### Current Limitations
+### Current Limitations & Issues
 
 * The extension will work for up to 5 instances of `grunt devtools` at a time
 (this means if you like to work on more than 5 projects at a time, you will need to turn off the task)
 
-* Background tasks are work in progress.
+* Unable to view output for background tasks ( work in progress...) and other output issues
 
 ### Release History
 
+* 0.1.0.4 - Adding Background Task support. You can now press `(B)` to send
+the task into background and continue running other tasks.
 * 0.1.0-alpha3 - Adds `Gruntfile.coffee` support
+

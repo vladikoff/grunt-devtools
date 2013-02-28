@@ -11,6 +11,12 @@ module.exports = function (grunt) {
     var http = require('http');
     var portscanner = require('portscanner');
 
+    var version = 0; // TODO
+    var pjson = require('../package.json');
+    if (pjson.version) {
+      version = pjson.version;
+    }
+
     // TODO: update this
     var projectPath = process.cwd().split('/');
     var projectName = projectPath[projectPath.length - 1];
@@ -28,9 +34,9 @@ module.exports = function (grunt) {
     portscanner.findAPortNotInUse(projectPort, projectPort + 4, 'localhost', function (error, port) {
       projectPort = port;
       if (projectPort) {
-      server.listen(port, function () {
-        grunt.log.ok("Grunt Devtools is ready! Proceed to the Chrome extension.");
-      });
+        server.listen(port, function () {
+          grunt.log.ok("Grunt Devtools v" + version + " is ready! Proceed to the Chrome extension.");
+        });
       } else {
         grunt.fail.warn("You're running too many Grunt Devtools, please close one.");
       }
@@ -43,50 +49,69 @@ module.exports = function (grunt) {
 
     wsServer.on('request', function (request) {
       var key = request.key;
-      //console.log(key);
       var connection = request.accept('echo-protocol', request.origin);
-      //console.log((new Date()) + ' Connection accepted.');
       connection.on('message', function (message) {
         if (message.type === 'utf8') {
           var msg = message.utf8Data;
-          if (msg === 'connect') {
-            connection.sendUTF(JSON.stringify({
-              tasks:basicTasks,
-              alias:aliasTasks,
-              project:projectName,
-              port:projectPort}));
+          try {
+            msg = JSON.parse(message.utf8Data);
+          } catch (e) {
           }
-          else if (allTasks.indexOf(msg) > -1) {
-            var watcher = spawn('grunt', [msg, '-no-color']);
-            workers.push(watcher);
-            connection.send("Running Task: " + msg);
-            watcher.stdout.on('data', function (data) {
-              //console.log(data);
-              if (data) {
-                connection.send(data.toString());
-              }
-            });
-            watcher.stdout.on('end', function (data) {
-              if (data) {
-                connection.send(data.toString());
-              }
-              connection.sendUTF(JSON.stringify({ action: 'done'}));
-            });
-            watcher.stderr.on('data', function (data) {
-              if (data) {
-                connection.send(data.toString());
-              }
-            });
-            watcher.on('exit', function (code) {
-              if (code !== 0) {
-                //console.log('ps process exited with code ' + code);
-              }
-            });
+          if (msg.action) {
+            if (msg.action === 'killTask') {
+              workers.forEach(function (worker) {
+                if (worker.pid === msg.task.pid) {
+                  worker.kill();
+                  connection.send("Task Killed: " + msg.task.name);
+                }
+              });
+            }
+          } else {
+            if (msg === 'handleSocketOpen') {
+              connection.sendUTF(JSON.stringify({
+                tasks:basicTasks,
+                alias:aliasTasks,
+                project:projectName,
+                port:projectPort
+              }));
+            }
+            else if (allTasks.indexOf(msg) > -1) {
+              var watcher = spawn('grunt', [msg, '-no-color']);
+              watcher.key = key;
+              workers.push(watcher);
+              connection.sendUTF(JSON.stringify({
+                action:'start',
+                name:msg,
+                pid:watcher.pid
+              }));
+              connection.send("Running Task: " + msg);
+              watcher.stdout.on('data', function (data) {
+                if (data) {
+                  connection.send(data.toString());
+                }
+              });
+              watcher.stdout.on('end', function (data) {
+                if (data) {
+                  connection.send(data.toString());
+                }
+                connection.sendUTF(JSON.stringify({ action:'done'}));
+              });
+              watcher.stderr.on('data', function (data) {
+                if (data) {
+                  connection.send(data.toString());
+                }
+              });
+              watcher.on('exit', function (code) {
+                if (code !== 0) {
+                  connection.send("Process Exited with code: " + code);
+                }
+              });
+            }
           }
         }
       });
       connection.on('close', function () {
-        // TODO: this
+        killWorkers(key);
       });
     });
 
@@ -94,11 +119,20 @@ module.exports = function (grunt) {
     /**
      * Clean up child processes
      */
-    var killWorkers = function () {
+    var killWorkers = function (key) {
       workers.forEach(function (worker) {
-        process.kill(worker);
+        if (key) {
+          if (worker.key === key) {
+            worker.kill();
+          }
+        } else {
+          process.kill(worker);
+        }
       });
-      process.exit();
+
+      if (!key) {
+        process.exit();
+      }
     };
 
     process.on("uncaughtException", killWorkers);
@@ -129,7 +163,7 @@ module.exports = function (grunt) {
             aliasTasks.push(line.split(/'/)[1]);
           }
         }
-      return aliasTasks;
+        return aliasTasks;
       } else {
         grunt.fail.warn('Cannot find Gruntfile.js or Gruntfile.coffee');
       }

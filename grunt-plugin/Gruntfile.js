@@ -35,24 +35,20 @@ module.exports = function(grunt) {
       }
     },
 
-    // Configuration to be run (and then tested).
-    devtools: {
-      default_options: {
-        options: {
+    connect: {
+        site1: {
+          options: {
+            keepalive: true,
+            port: 9000,
+            base: 'www-roots/site1'
+          }
         },
-        files: {
-          'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123'],
-        },
-      },
-      custom_options: {
-        options: {
-          separator: ': ',
-          punctuation: ' !!!',
-        },
-        files: {
-          'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123'],
-        },
-      },
+        site2: {
+          options: {
+            port: 9001,
+            base: 'www-roots/site2'
+          }
+        }
     },
 
     // Unit tests.
@@ -70,12 +66,14 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-connect');
 
   // Whenever the "test" task is run, first clean the "tmp" dir, then run this
   // plugin's task(s), then test the result.
   grunt.registerTask('test', ['clean', 'devtools', 'nodeunit']);
   grunt.registerTask('mycleanalias', ['clean']);
   grunt.registerTask('dev', ['watch']);
+    grunt.registerTask('connectTwo', ['connect:site1']);
 
   // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'test']);
