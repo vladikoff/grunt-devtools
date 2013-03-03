@@ -215,7 +215,8 @@ function updateTaskList() {
 
 function setProject(idx) {
   // if not running, change the active project. Otherwise it stays the same
-  //if ((projects.length > 0 && !currentProject.running) ) {
+
+    // TODO: bug here, need to check if the task is running
     // get project by index
     currentProject = projects[idx];
     // update project tab style
@@ -232,7 +233,6 @@ function setProject(idx) {
     if (currentProject) {
       updateTaskList();
     }
-  //}
 }
 
 /**

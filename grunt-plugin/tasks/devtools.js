@@ -92,17 +92,20 @@ module.exports = function (grunt) {
               watcher.stdout.on('data', function (data) {
                 if (data) {
                   connection.send(watcher.pid + '|' + data.toString());
+                  grunt.log.writeln().write(data.toString());
                 }
               });
               watcher.stdout.on('end', function (data) {
                 if (data) {
                   connection.send(watcher.pid + '|' + data.toString());
+                  grunt.log.writeln().write(data.toString());
                 }
                 connection.sendUTF(JSON.stringify({ action:'done', pid:watcher.pid }));
               });
               watcher.stderr.on('data', function (data) {
                 if (data) {
                   connection.send(watcher.pid + '|' + data.toString());
+                  grunt.log.writeln().write(data.toString());
                 }
               });
               watcher.on('exit', function (code) {
