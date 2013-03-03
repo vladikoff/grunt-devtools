@@ -11,28 +11,28 @@ var socket,
  * Port settings
  */
 var startPort = 61749,
-currentPort = startPort,
-maxPort = currentPort + 5;
+  currentPort = startPort,
+  maxPort = currentPort + 5;
 
 /**
  * Templates
  */
-var projectListTpl = _.template( $("#projectList").html()),
-  taskListTpl = _.template( $("#taskList").html() ),
-  bgTasksTpl = _.template( $("#bgTaskList").html() );
+var projectListTpl = _.template($("#projectList").html()),
+  taskListTpl = _.template($("#taskList").html()),
+  bgTasksTpl = _.template($("#bgTaskList").html());
 
 /**
  * UI Selectors
  */
 var $output = $("#placeOutput"),
-$outputWrap = $('#output'),
-$body = $('body'),
-$tasks = $('#tasks'),
-$bgSection = $('#backgroundTasks'),
-$bgTasks = $('#placeBackgroundTasks'),
-$regularTasks = $('#placeTasks'),
-$aliasTasks = $('#placeAliasTasks'),
-$projects = $('#placeProjects');
+  $outputWrap = $('#output'),
+  $body = $('body'),
+  $tasks = $('#tasks'),
+  $bgSection = $('#backgroundTasks'),
+  $bgTasks = $('#placeBackgroundTasks'),
+  $regularTasks = $('#placeTasks'),
+  $aliasTasks = $('#placeAliasTasks'),
+  $projects = $('#placeProjects');
 
 /**
  * Connect to a devtools socket
@@ -216,23 +216,24 @@ function updateTaskList() {
 function setProject(idx) {
   // if not running, change the active project. Otherwise it stays the same
 
-    // TODO: bug here, need to check if the task is running
-    // get project by index
-    currentProject = projects[idx];
-    // update project tab style
-    var buttons = $projects.find('button');
-    buttons.removeClass('active');
-    $(buttons.get(idx)).addClass('active');
-    // clear output
-    if (currentProject && currentProject.currentTask) {
-      $output.html(currentProject.currentTask.output);
-    } else {
-      $output.html('');
-    }
-    // update task lists for this project
-    if (currentProject) {
-      updateTaskList();
-    }
+  // TODO: bug here, need to check if the task is running
+  // get project by index
+  currentProject = projects[idx];
+  // update project tab style
+  var buttons = $projects.find('button');
+  buttons.removeClass('active');
+  $(buttons.get(idx)).addClass('active');
+  // clear output
+  if (currentProject && currentProject.currentTask) {
+    $output.html(currentProject.currentTask.output);
+  } else {
+    $output.html('');
+  }
+  // update task lists for this project
+  if (currentProject) {
+    updateTaskList();
+  }
+  enableActivity();
 }
 
 /**
@@ -249,7 +250,7 @@ $tasks.on('click', '.task', function () {
   var cmd = $(this).val();
 
   currentProject.running = true;
-  $tasks.find('.b-on').each(function() {
+  $tasks.find('.b-on').each(function () {
     cmd += ' ' + $(this).val();
   });
   currentProject.socket.send(cmd);
@@ -290,7 +291,7 @@ $tasks.on('click', '.b-bg', function () {
 });
 
 // set flags
-$tasks.on('click','.b-flag', function () {
+$tasks.on('click', '.b-flag', function () {
   var bData = $(this);
   bData.hasClass('b-on') ? bData.removeClass('b-on') : bData.addClass('b-on');
 });
