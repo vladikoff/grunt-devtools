@@ -20,7 +20,3 @@ grunt.loadNpmTasks('grunt-devtools');
 ## The "devtools" task
 
 Run `grunt-devtools` and open the [Grunt Devtools](https://chrome.google.com/webstore/detail/grunt-devtools/fbiodiodggnlakggeeckkjccjhhjndnb?hl=en) extension 
-
-## TODO
-
-* Test Windows and other OS

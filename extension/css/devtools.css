@@ -106,15 +106,62 @@ h2, label {
   color: white;
 }
 
-
 #tasks li .b.b-kill {
   opacity: 0.7;
   background: rgba(92, 110, 129, 0.9);
 }
 
+#tasks li .b.b-second {
+  right: 40px;
+}
+
 #tasks li .b.b-bg {
   background: green;
-  right: 40px;
+}
+
+
+#tasks li .b-flag {
+  opacity: 0.2;
+}
+
+#tasks li .b-flag:hover {
+  opacity: 0.6;
+}
+
+#tasks li .b-flag.b-on {
+  opacity: 1;
+}
+
+#tasks li .b.b-flag {
+  display: none;
+}
+
+#tasks li .b.b-flag.b-on {
+  display: block;
+}
+
+#tasks li:hover .b.b-flag  {
+  display: block;
+}
+
+.running #tasks li:hover .b.b-flag {
+  display: none;
+}
+
+#tasks li .b.b-verbose:hover {
+  background: orange;
+}
+
+#tasks li .b.b-force:hover {
+  background: #ff3d00;
+}
+
+#tasks li .b.b-verbose.b-on {
+  background: orange;
+}
+
+#tasks li .b.b-force.b-on {
+  background: #ff3d00;
 }
 
 pre {
@@ -220,8 +267,7 @@ button {
   left: 0;
 }
 
-.running #tasks .task:hover,
-.running #projects button:hover {
+.running #tasks .task:hover {
   cursor: not-allowed;
 }
 

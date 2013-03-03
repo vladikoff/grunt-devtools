@@ -49,8 +49,16 @@ Run `grunt devtools` to get things rolling!
 
 * Unable to view output for background tasks ( work in progress...) and other output issues
 
+* Background tasks disappear when done
+
+## TODO
+
+* Test Windows and Linux
+* registerMultiTask support
+
 ### Release History
 
+* 0.1.0.5 - Updating UI, Adding a way to set flags `--force` and `--verbose`, output fixes, background task updates.
 * 0.1.0.4 - Adding Background Task support. You can now press `(B)` to send
 the task into background and continue running other tasks.
 * 0.1.0-alpha3 - Adds `Gruntfile.coffee` support

@@ -61,13 +61,16 @@ module.exports = function (grunt) {
             if (msg.action === 'killTask') {
               workers.forEach(function (worker) {
                 if (worker.pid === msg.task.pid) {
+                  connection.send(worker.pid + '|' + 'Task Killed: ' + msg.task.name);
                   worker.kill();
-                  connection.send("Task Killed: " + msg.task.name);
                 }
               });
             }
           } else {
-            if (msg === 'handleSocketOpen') {
+            var cmd = msg.split(' ');
+            cmd.push('-no-color');
+
+            if (cmd[0] === 'handleSocketOpen') {
               connection.sendUTF(JSON.stringify({
                 tasks:basicTasks,
                 alias:aliasTasks,
@@ -75,35 +78,36 @@ module.exports = function (grunt) {
                 port:projectPort
               }));
             }
-            else if (allTasks.indexOf(msg) > -1) {
-              var watcher = spawn('grunt', [msg, '-no-color']);
+            else if (allTasks.indexOf(cmd[0]) > -1) {
+              var watcher = spawn('grunt', cmd);
               watcher.key = key;
               workers.push(watcher);
               connection.sendUTF(JSON.stringify({
                 action:'start',
-                name:msg,
+                name:cmd[0],
                 pid:watcher.pid
               }));
-              connection.send("Running Task: " + msg);
+              // TODO: fix bug here with running task return
+              connection.send('Running Task: ' + cmd[0]);
               watcher.stdout.on('data', function (data) {
                 if (data) {
-                  connection.send(data.toString());
+                  connection.send(watcher.pid + '|' + data.toString());
                 }
               });
               watcher.stdout.on('end', function (data) {
                 if (data) {
-                  connection.send(data.toString());
+                  connection.send(watcher.pid + '|' + data.toString());
                 }
-                connection.sendUTF(JSON.stringify({ action:'done'}));
+                connection.sendUTF(JSON.stringify({ action:'done', pid:watcher.pid }));
               });
               watcher.stderr.on('data', function (data) {
                 if (data) {
-                  connection.send(data.toString());
+                  connection.send(watcher.pid + '|' + data.toString());
                 }
               });
               watcher.on('exit', function (code) {
                 if (code !== 0) {
-                  connection.send("Process Exited with code: " + code);
+                  connection.send(watcher.pid + '|' + 'Process Exited with code: ' + code);
                 }
               });
             }
@@ -163,10 +167,10 @@ module.exports = function (grunt) {
             aliasTasks.push(line.split(/'/)[1]);
           }
         }
-        return aliasTasks;
       } else {
         grunt.fail.warn('Cannot find Gruntfile.js or Gruntfile.coffee');
       }
+      return aliasTasks;
     }
   });
 };
