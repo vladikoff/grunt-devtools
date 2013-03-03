@@ -34,13 +34,11 @@ Run `grunt devtools` to get things rolling!
 
 ### Preview Screenshots
 
-![](http://v14d.com/i/512f287f30388.jpg)
+![](http://v14d.com/i/513394803d3d9.jpg)
+![](http://v14d.com/i/513393cbb7e8b.jpg)
+![](http://v14d.com/i/5133941ceb6b4.jpg)
 
-![](http://v14d.com/i/512f28f92eef4.jpg)
 
-![](http://v14d.com/i/512f29c259903.jpg)
-
-![](http://v14d.com/i/512f2a4d7e8f0.jpg)
 
 ### Current Limitations & Issues
 
