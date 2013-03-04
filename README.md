@@ -38,14 +38,18 @@ Run `grunt devtools` to get things rolling!
 ![](http://v14d.com/i/513393cbb7e8b.jpg)
 ![](http://v14d.com/i/5133941ceb6b4.jpg)
 
+### Issues
 
+If you experience issues, make sure that the version of the Chrome extension matches the
+version of `grunt devtools`.
 
-### Current Limitations & Issues
+The Chrome extension is auto-updated. However the npm module has to be manually updated.
+![](http://v14d.com/i/5134559bdb23a.jpg)
+
+### Current Limitations
 
 * The extension will work for up to 5 instances of `grunt devtools` at a time
 (this means if you like to work on more than 5 projects at a time, you will need to turn off the task)
-
-* Unable to view output for background tasks ( work in progress...) and other output issues
 
 * Background tasks disappear when done
 
