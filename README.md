@@ -17,6 +17,10 @@ add-on for Chrome Dev Tools from the Chrome Web Store.
 * open Chrome Dev tools, find the Grunt tab. Your grunt tasks should now be accessible from Chrome.
 
 
+## Updating from an older version
+
+* Chrome extension updates automatically
+* Grunt plugin updates using `npm install grunt-devtools` ( auto-update might be coming soon )
 
 ## Dev Setup
 
