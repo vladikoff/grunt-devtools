@@ -35,7 +35,7 @@ h2, label {
 #backgroundTasks, #killTask {
   display: none;
 }
-#backgroundTasks.show {
+#backgroundTasks.show, #updateWarning.show {
   display: block;
 }
 
@@ -285,6 +285,22 @@ button {
 
 .running #running {
   display: block;
+}
+
+#updateWarning {
+  display: none;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  border: 1px solid rgb(64%, 64%, 64%);
+  border-left: none;
+  border-bottom: none;
+  background: -webkit-linear-gradient(top, #fefcea 0%,#f1da36 100%);
+  font-size: 10px;
+}
+
+#updateWarning p {
+  padding: 0 10px;
 }
 
 @media all and (max-width: 250px) {

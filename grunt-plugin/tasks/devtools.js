@@ -5,24 +5,23 @@ module.exports = function (grunt) {
   grunt.registerTask('devtools', 'Runs a server for devtools', function () {
     this.async();
     var WebSocketServer = require('websocket').server;
-    var fs = require("fs");
-    var spawn = require("child_process").spawn;
-    var workers = [];
-    var http = require('http');
-    var portscanner = require('portscanner');
 
-    var version = 0; // TODO
-    var pjson = require('../package.json');
-    if (pjson.version) {
+    var fs = require("fs"),
+      spawn = require("child_process").spawn,
+      http = require('http'),
+      portscanner = require('portscanner');
+
+    var workers = [];
+
+    var pjson = require('../package.json'),
       version = pjson.version;
-    }
 
     // TODO: update this
-    var projectPath = process.cwd().split('/');
-    var projectName = projectPath[projectPath.length - 1];
-    var aliasTasks = getAliasTasks();
-    var allTasks = Object.keys(grunt.task._tasks);
-    var basicTasks = grunt.util._.difference(allTasks, aliasTasks);
+    var projectPath = process.cwd().split('/'),
+      projectName = projectPath[projectPath.length - 1],
+      aliasTasks = getAliasTasks(),
+      allTasks = Object.keys(grunt.task._tasks),
+      basicTasks = grunt.util._.difference(allTasks, aliasTasks);
 
     var server = http.createServer(function (request, response) {
       response.writeHead(404);
@@ -43,8 +42,8 @@ module.exports = function (grunt) {
     });
 
     var wsServer = new WebSocketServer({
-      httpServer:server,
-      autoAcceptConnections:false
+      httpServer: server,
+      autoAcceptConnections: false
     });
 
     wsServer.on('request', function (request) {
@@ -72,10 +71,11 @@ module.exports = function (grunt) {
 
             if (cmd[0] === 'handleSocketOpen') {
               connection.sendUTF(JSON.stringify({
-                tasks:basicTasks,
-                alias:aliasTasks,
-                project:projectName,
-                port:projectPort
+                tasks: basicTasks,
+                alias: aliasTasks,
+                project: projectName,
+                port: projectPort,
+                devtoolsVersion: version
               }));
             }
             else if (allTasks.indexOf(cmd[0]) > -1) {
@@ -83,9 +83,9 @@ module.exports = function (grunt) {
               watcher.key = key;
               workers.push(watcher);
               connection.sendUTF(JSON.stringify({
-                action:'start',
-                name:cmd[0],
-                pid:watcher.pid
+                action: 'start',
+                name: cmd[0],
+                pid: watcher.pid
               }));
               // TODO: fix bug here with running task return
               connection.send('Running Task: ' + cmd[0]);
@@ -100,7 +100,7 @@ module.exports = function (grunt) {
                   connection.send(watcher.pid + '|' + data.toString());
                   grunt.log.writeln().write(data.toString());
                 }
-                connection.sendUTF(JSON.stringify({ action:'done', pid:watcher.pid }));
+                connection.sendUTF(JSON.stringify({ action: 'done', pid: watcher.pid }));
               });
               watcher.stderr.on('data', function (data) {
                 if (data) {

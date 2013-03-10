@@ -59,11 +59,13 @@ The Chrome extension is auto-updated. However the npm module has to be manually 
 
 ## TODO
 
-* Test Windows and Linux
+* Test Windows
 * registerMultiTask support
+* send tasks into background right away
 
 ### Release History
 
+* 0.1.0.7 - Fixes, added update warnings.
 * 0.1.0.6 - Various fixes.
 * 0.1.0.5 - Updating UI, Adding a way to set flags `--force` and `--verbose`, output fixes, background task updates.
 * 0.1.0.4 - Adding Background Task support. You can now press `(B)` to send

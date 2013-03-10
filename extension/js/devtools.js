@@ -1,29 +1,25 @@
 'use strict';
 
-/**
- * Grunt project setting
- */
+// Chrome extension
+var manifest = chrome.runtime.getManifest(),
+  extVersion = manifest.version;
+
+// Grunt project setting
 var socket,
   projects = [],
   currentProject;
 
-/**
- * Port settings
- */
+// Port settings
 var startPort = 61749,
   currentPort = startPort,
   maxPort = currentPort + 5;
 
-/**
- * Templates
- */
+// Templates
 var projectListTpl = _.template($("#projectList").html()),
   taskListTpl = _.template($("#taskList").html()),
   bgTasksTpl = _.template($("#bgTaskList").html());
 
-/**
- * UI Selectors
- */
+// UI Selectors
 var $output = $("#placeOutput"),
   $outputWrap = $('#output'),
   $body = $('body'),
@@ -32,7 +28,8 @@ var $output = $("#placeOutput"),
   $bgTasks = $('#placeBackgroundTasks'),
   $regularTasks = $('#placeTasks'),
   $aliasTasks = $('#placeAliasTasks'),
-  $projects = $('#placeProjects');
+  $projects = $('#placeProjects'),
+  $warning = $('#updateWarning');
 
 /**
  * Connect to a devtools socket
@@ -82,13 +79,14 @@ function handleSocketMessage(event) {
       // connecting a new project
       // add this new project
       projects.push({
-        name:data.project,
-        port:parseInt(data.port),
-        socket:socket,
-        taskListAlias:data.alias,
-        taskListGeneric:data.tasks,
-        tasks:[],
-        running:false
+        name: data.project,
+        port: parseInt(data.port),
+        socket: socket,
+        taskListAlias: data.alias,
+        taskListGeneric: data.tasks,
+        tasks: [],
+        running: false,
+        devtoolsVersion: data.devtoolsVersion
       });
 
       // add new project button
@@ -107,7 +105,7 @@ function handleSocketMessage(event) {
     }
     // process started
     else if (data && data.action === 'start') {
-      currentProject.currentTask = {name:data.name, pid:data.pid, output:[]};
+      currentProject.currentTask = {name: data.name, pid: data.pid, output: []};
       currentProject.tasks.push(currentProject.currentTask);
       updateTaskList();
     }
@@ -117,21 +115,25 @@ function handleSocketMessage(event) {
       $output.html('');
     } else if (data.length > 1) {
       if (currentProject.tasks.length > 0) {
-        var msg = data.split("|");
-        var pid = msg[0];
-        var timestamp = new Date().toString().split(' ')[4];
-        var output = '<pre>' + timestamp + ' - ' + msg[1] + '</pre>';
+        var msg = data.split("|"),
+          pid = msg[0],
+          timestamp = new Date().toString().split(' ')[4],
+          output = '<pre>' + timestamp + ' - ' + _.escape(msg[1]) + '</pre>';
+
+        // find a task with a process id of the message
         var pidTask = _.find(currentProject.tasks, function (task) {
           return task.pid === parseInt(pid);
         });
+
+        // if we found a task with a pid
         if (pidTask) {
           pidTask.output.push(output);
         }
-        // append output
+
+        // append output to the current view if the process id matches
         if (currentProject.currentTask && parseInt(pid) === currentProject.currentTask.pid) {
           $output.append(output);
-          // TODO: fix this
-          $outputWrap.scrollTop(99999);
+          $outputWrap.scrollTop($output.height());
         }
       }
     }
@@ -175,7 +177,7 @@ function handleSocketClose(e) {
  */
 function handleSocketError() {
   // TODO: update this
-  alert('Something went really wrong, please report this...');
+  console.log('Something went really wrong, please report this...');
 }
 
 function updateProjectList() {
@@ -185,8 +187,8 @@ function updateProjectList() {
 
 function updateTaskList() {
   // set the tasks
-  $regularTasks.html(taskListTpl({buttons:currentProject.taskListGeneric}));
-  $aliasTasks.html(taskListTpl({buttons:currentProject.taskListAlias}));
+  $regularTasks.html(taskListTpl({buttons: currentProject.taskListGeneric}));
+  $aliasTasks.html(taskListTpl({buttons: currentProject.taskListAlias}));
 
   if (currentProject.currentTask) {
     $('.task[value="' + currentProject.currentTask.name + '"]')
@@ -203,7 +205,7 @@ function updateTaskList() {
 
   if (bgTasks.length > 0) {
     $bgSection.addClass('show');
-    $bgTasks.html(bgTasksTpl({tasks:bgTasks}));
+    $bgTasks.html(bgTasksTpl({tasks: bgTasks}));
   } else {
     $bgSection.removeClass('show');
   }
@@ -223,6 +225,14 @@ function setProject(idx) {
   var buttons = $projects.find('button');
   buttons.removeClass('active');
   $(buttons.get(idx)).addClass('active');
+  console.log(currentProject.devtoolsVersion);
+  // check version
+  if (currentProject.devtoolsVersion == null || currentProject.devtoolsVersion.replace(/-/g, '.') !== extVersion) {
+    $warning.addClass('show');
+  } else {
+    $warning.removeClass('show');
+  }
+
   // clear output
   if (currentProject && currentProject.currentTask) {
     $output.html(currentProject.currentTask.output);
@@ -304,7 +314,7 @@ $tasks.on('click', '.b-kill', function () {
 
   // if there's a pid, use it instead
   if (btn.data('pid')) {
-    taskInfo = {name:btn.val(), pid:btn.data('pid')};
+    taskInfo = {name: btn.val(), pid: btn.data('pid')};
     // TODO: validate this?
     currentProject.tasks = _.reject(currentProject.tasks, function (task) {
       return task.pid === btn.data('pid');
@@ -312,8 +322,8 @@ $tasks.on('click', '.b-kill', function () {
     updateTaskList();
   }
   currentProject.socket.send(JSON.stringify({
-    action:'killTask',
-    task:taskInfo
+    action: 'killTask',
+    task: taskInfo
   }));
 });
 
