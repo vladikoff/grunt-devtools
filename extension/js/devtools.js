@@ -132,6 +132,8 @@ function handleSocketMessage(event) {
 
         // append output to the current view if the process id matches
         if (currentProject.currentTask && parseInt(pid) === currentProject.currentTask.pid) {
+          var findReplace = [[/&/g, "&amp;"], [/</g, "&lt;"], [/>/g, "&gt;"], [/"/g, "&quot;"]];
+          for (var item in findReplace) output = output.replace(findReplace[item][0], findReplace[item][1]);
           $output.append(output);
           $outputWrap.scrollTop($output.height());
         }
