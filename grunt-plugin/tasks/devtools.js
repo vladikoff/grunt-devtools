@@ -66,10 +66,26 @@ module.exports = function (grunt) {
               });
             }
           } else {
-            var cmd = msg.split(' ');
+
+            // get the command from the request
+            var cmd = msg.split(' '),
+              // default spawn command
+              spawnCmd = 'grunt',
+              // task name we want to run
+              taskName = cmd[0];
+
+            // add no color option
             cmd.push('-no-color');
 
-            if (cmd[0] === 'handleSocketOpen') {
+            // brackets env
+            if (grunt.option('env') === 'brackets') {
+              // need a full node path
+              spawnCmd = '/usr/local/bin/node';
+              // add grunt to our list
+              cmd.unshift('/usr/local/bin/grunt');
+            }
+
+            if (taskName === 'handleSocketOpen') {
               connection.sendUTF(JSON.stringify({
                 tasks: basicTasks,
                 alias: aliasTasks,
@@ -78,8 +94,8 @@ module.exports = function (grunt) {
                 devtoolsVersion: version
               }));
             }
-            else if (allTasks.indexOf(cmd[0]) > -1) {
-              var watcher = spawn('grunt', cmd);
+            else if (allTasks.indexOf(taskName) > -1) {
+              var watcher = spawn(spawnCmd, cmd);
               watcher.key = key;
               workers.push(watcher);
               connection.sendUTF(JSON.stringify({
@@ -88,24 +104,21 @@ module.exports = function (grunt) {
                 pid: watcher.pid
               }));
               // TODO: fix bug here with running task return
-              connection.send('Running Task: ' + cmd[0]);
+              connection.send('Running Task: ' + taskName);
               watcher.stdout.on('data', function (data) {
                 if (data) {
                   connection.send(watcher.pid + '|' + data.toString());
-                  grunt.log.writeln().write(data.toString());
                 }
               });
               watcher.stdout.on('end', function (data) {
                 if (data) {
                   connection.send(watcher.pid + '|' + data.toString());
-                  grunt.log.writeln().write(data.toString());
                 }
                 connection.sendUTF(JSON.stringify({ action: 'done', pid: watcher.pid }));
               });
               watcher.stderr.on('data', function (data) {
                 if (data) {
                   connection.send(watcher.pid + '|' + data.toString());
-                  grunt.log.writeln().write(data.toString());
                 }
               });
               watcher.on('exit', function (code) {

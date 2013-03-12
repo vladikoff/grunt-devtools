@@ -225,7 +225,6 @@ function setProject(idx) {
   var buttons = $projects.find('button');
   buttons.removeClass('active');
   $(buttons.get(idx)).addClass('active');
-  console.log(currentProject.devtoolsVersion);
   // check version
   if (currentProject.devtoolsVersion == null || currentProject.devtoolsVersion.replace(/-/g, '.') !== extVersion) {
     $warning.addClass('show');

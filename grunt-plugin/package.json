@@ -1,7 +1,7 @@
 {
   "name": "grunt-devtools",
   "description": "Experimental! Grunt integration with Chrome Dev Tools",
-  "version": "0.1.0-7",
+  "version": "0.1.0-8",
   "homepage": "https://github.com/vladikoff/grunt-devtools",
   "author": {
     "name": "vladikoff",
@@ -44,6 +44,7 @@
     "devtools"
   ],
   "dependencies": {
+    "async": "~0.1.22",
     "websocket": "~1.0.8",
     "portscanner": "~0.1.3"
   }
