@@ -67,7 +67,8 @@ module.exports = function (grunt) {
             }
           } else {
             var cmd = msg.split(' ');
-            cmd.push('-no-color');
+            // For colorized version we don't need -no-color option
+            // cmd.push('-no-color');
 
             if (cmd[0] === 'handleSocketOpen') {
               connection.sendUTF(JSON.stringify({

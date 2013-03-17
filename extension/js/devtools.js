@@ -31,6 +31,90 @@ var $output = $("#placeOutput"),
   $projects = $('#placeProjects'),
   $warning = $('#updateWarning');
 
+
+var modStyles = {
+  // "name": [beginCode, endCode, htmlTag]
+  'bold': [1, 22, "b"],
+  'italic': [2, 23, "i"],
+  'underline': [4, 24, "u"],
+  'inverse': [7, 27, "span"],
+  'strikethrough': [9, 29, "del"]
+};
+
+
+var colorStyles = {
+  // "name": beginCode (endCode is always "39" and htmlTag is "span")
+  'white': 37,
+  'grey': 90,
+  'black': 30,
+  'blue': 34,
+  'cyan': 36,
+  'green': 32,
+  'magenta': 35,
+  'red': 31,
+  'yellow': 33
+};
+
+var regExps = null;
+
+function beginTag(tag,cls) {
+  return '<'+tag+' class="'+cls+'">';
+}
+
+function endTag(tag) {
+  return '</'+tag+'>';
+}
+
+function themeClass(name) {
+  return 'theme-'+name;
+}
+
+function cliRegExp(num) {
+  return new RegExp('\x1B\\['+num+'m', "g");
+}
+
+
+/**
+ * Create regular expression from styles definition
+ */
+function getRegExps(modStyles, colorStyles) {
+  if (!_.isNull(regExps)) return regExps;
+
+  var i=1, name;
+  regExps = [[cliRegExp(39), endTag("span")]];
+  for (name in modStyles) {
+      regExps[i++] = [
+        cliRegExp(modStyles[name][0]), 
+        beginTag(modStyles[name][2], themeClass(name))
+      ];
+      regExps[i++] = [
+        cliRegExp(modStyles[name][1]), 
+        endTag(modStyles[name][2])
+      ];
+  }
+  for (name in colorStyles) {
+    regExps[i++] = [
+      cliRegExp(colorStyles[name]), 
+      beginTag("span", themeClass(name))
+    ];
+  }
+
+  return regExps;
+}
+
+/**
+ * Colorize a message. 
+ */
+function colorize(msg) {
+  var regExps = getRegExps(modStyles, colorStyles);
+  var result = msg;
+  for (var r in regExps) {
+    result = result.replace(regExps[r][0], regExps[r][1]);
+  }
+  return result;
+}
+
+
 /**
  * Connect to a devtools socket
  */
@@ -118,7 +202,7 @@ function handleSocketMessage(event) {
         var msg = data.split("|"),
           pid = msg[0],
           timestamp = new Date().toString().split(' ')[4],
-          output = '<pre>' + timestamp + ' - ' + _.escape(msg[1]) + '</pre>';
+          output = '<pre><span class="theme-timestamp">' + timestamp + '</span> - ' + colorize(_.escape(msg[1])) + '</pre>';
 
         // find a task with a process id of the message
         var pidTask = _.find(currentProject.tasks, function (task) {
