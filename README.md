@@ -42,6 +42,7 @@ Load unpacked extension from the `extension` folder.
 ## Issues
 
 If you experience issues, perform an [update first](https://github.com/vladikoff/grunt-devtools#updating-from-an-older-version).
+Check the [project wiki](https://github.com/vladikoff/grunt-devtools/wiki).
 If issues still occur - [report it](https://github.com/vladikoff/grunt-devtools/issues) or ask for help in the  `#grunt` irc channel on `freenode`
 
 ## Current Limitations
