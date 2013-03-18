@@ -1,0 +1,5 @@
+<% _.each(tasks, function(task) { %>
+<li>
+  <button class='bgTask' value='<%= task.name %>'><%= task.name %></button>
+  <button title='Kill Task' class='b b-kill' data-pid='<%= task.pid %>'>X</button>
+</li><% }); %>

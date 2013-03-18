@@ -45,37 +45,6 @@
 
     <progress id='running'></progress>
 
-    <script id="projectList" type="text/template">
-      <% _.each(projects, function(project, i) { %>
-        <button value='<%= i %>'><%= project.name %></button>
-      <% }); %>
-    </script>
-
-    <script id="taskList" type="text/template">
-      <% _.each(buttons, function(name) { %>
-        <li>
-          <button class='task' value='<%= name %>'><%= name %></button>
-
-          <button title='Set --verbose' class='b b-second b-flag b-verbose' value='-v'>V</button>
-          <button title='Set --force' class='b b-first b-flag b-force' value='-f'>F</button>
-
-          <button title='Add to Background Tasks' class='b b-second b-bg'>B</button>
-          <button title='Kill Task' class='b b-first b-kill'>X</button>
-        </li>
-      <% }); %>
-    </script>
-
-    <script id="bgTaskList" type="text/template">
-      <% _.each(tasks, function(task) { %>
-      <li>
-        <button class='bgTask' value='<%= task.name %>'><%= task.name %></button>
-        <button title='Kill Task' class='b b-kill' data-pid='<%= task.pid %>'>X</button>
-      </li><% }); %>
-    </script>
-
-    <script src='js/runtime.js'></script>
-    <script src='js/vendor/jquery.min.js'></script>
-    <script src='js/vendor/lodash.min.js'></script>
     <script src='js/devtools.js'></script>
   </body>
 </html>

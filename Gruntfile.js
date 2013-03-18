@@ -28,15 +28,46 @@ module.exports = function (grunt) {
       all: ['tmp', 'extension/build']
     },
 
-    copy: {
-      core: {
-        files: [
-          {expand: true, cwd: 'extension/src/', src: ['css/**', 'img/**', 'js/**'], dest: 'extension/build/build-chrome/'}
-        ]
+    jst: {
+      chrome: {
+        files: {
+          "extension/build/build-chrome/tmp/templates.js": ["extension/src/templates/**/*.*"]
+        }
+      },
+      brackets: {
+        files: {
+          "extension/build/build-brackets/tmp/templates.js": ["extension/src/templates/**/*.*"]
+        }
+      }
+    },
+
+    concat: {
+      options: {
+        separator: ';'
       },
       chrome: {
+        src: [
+          'extension/src/js/vendor/*.js',
+          'extension/build/build-chrome/tmp/templates.js',
+          'extension/src-chrome/js/*.js',
+          'extension/src/js/*.js'
+
+        ],
+        dest: 'extension/build/build-chrome/grunt-devtools/js/devtools.js'
+      }
+    },
+
+    copy: {
+      chrome: {
         files: [
-          { expand: true, cwd: 'extension/src-chrome/', src: ['*', 'js/**'], dest: 'extension/build/build-chrome/'}
+          { expand: true, cwd: 'extension/src/', src: ['*', 'css/**', 'img/**', '!less', '!templates'], dest: 'extension/build/build-chrome/grunt-devtools'},
+          { expand: true, cwd: 'extension/src-chrome/', src: ['*'], dest: 'extension/build/build-chrome/grunt-devtools'}
+        ]
+      },
+      brackets: {
+        files: [
+          { expand: true, cwd: 'extension/src/', src: ['*', 'css/**', 'img/**', 'js/**', '!less', '!templates'], dest: 'extension/build/build-brackets/grunt-devtools'},
+          { expand: true, cwd: 'extension/src-brackets/', src: ['*', 'node/**', 'js/**', 'img/**', 'templates/**'], dest: 'extension/build/build-brackets/grunt-devtools'}
         ]
       }
     },
@@ -44,20 +75,29 @@ module.exports = function (grunt) {
     less: {
       chrome: {
         files: {
-          "extension/build/build-chrome/css/devtools.css": "extension/src/less/devtools.less"
+          "extension/build/build-chrome/grunt-devtools/css/devtools.css": "extension/src/less/devtools.less"
+        }
+      },
+      brackets: {
+        files: {
+          "extension/build/build-brackets/grunt-devtools/css/devtools.css": "extension/src/less/devtools.less",
+          "extension/build/build-brackets/grunt-devtools/css/devtools-brackets.css": "extension/src-brackets/less/grunt-devtools-brackets-skin.less",
+          "extension/build/build-brackets/grunt-devtools/css/grunt-devtools-brackets-ui.css": "extension/src-brackets/less/grunt-devtools-brackets-ui.less"
         }
       }
     },
 
     watch: {
-      tests: {
-        files: 'extension/**/*',
+      extension: {
+        files: [
+          'extension/src/**/*',
+          'extension/src-chrome/**/*',
+          'extension/src-brackets/**/*'
+        ],
         tasks: ['build']
       }
     }
   });
-
-  //grunt.loadTasks('tasks');
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -65,30 +105,27 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-jst');
+  grunt.loadNpmTasks('grunt-devtools');
 
   grunt.registerTask('dev', ['watch']);
-  grunt.registerTask('connectTwo', ['connect:site1']);
 
-  grunt.registerTask('default', ['jshint', 'build']);
+  grunt.registerTask('default', ['build']);
 
   grunt.registerTask('build:chrome', [
-    'clean:all',
-    'copy:core',
     'copy:chrome',
+    'jst:chrome',
+    'concat:chrome',
+    'less:chrome'
   ]);
 
-  /*
-   grunt.registerTask('build:brackets', [
-   'coffee:compile',
-   'urequire',
-   'copy:amd',
-   'concat:amd',
-   'uglify:amd',
-   'compress:amd',
-   ]);
-   */
+  grunt.registerTask('build:brackets', [
+    'copy:brackets',
+    'jst:brackets',
+    'less:brackets'
+  ]);
+
   // build all extensions
   grunt.registerTask('build', ['build:chrome', 'build:brackets']);
-
-
 };

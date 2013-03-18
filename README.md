@@ -1,17 +1,28 @@
-grunt-devtools (preview)
+grunt-devtools
 ==============
 
-Grunt Task Runner Extension for Chrome Developer Tools
+Grunt Task Runner Extension for Chrome Developer Tools and Adobe Brackets
 
-## Quick Setup
 
-* Download the [Grunt Devtools](https://chrome.google.com/webstore/detail/grunt-devtools/fbiodiodggnlakggeeckkjccjhhjndnb?hl=en)
-add-on for Chrome Dev Tools from the Chrome Web Store.
+## Quick Setup (Google Chrome)
 
+* Download the [Grunt Devtools extension for Chrome Developer Tools](https://chrome.google.com/webstore/detail/grunt-devtools/fbiodiodggnlakggeeckkjccjhhjndnb?hl=en)
+ from the Chrome Web Store.
 * `npm install grunt-devtools` in your grunt project
 * Add `grunt.loadNpmTasks('grunt-devtools');` to your `Gruntfile`
 * run `grunt devtools`
 * open Chrome Dev tools, find the Grunt tab. Your grunt tasks should now be accessible from Chrome.
+
+
+## Quick Setup (Adobe Brackets)
+
+* Download [brackets-grunt-devtools.zip](^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^TODO: URL_HERE^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^)
+* Copy `grunt-devtools` directory into the user extension folder, which can be opened by selecting `Help > Show Extensions Folder` in Brackets.
+Brackets needs to be restarted after installing a new extension.
+* `npm install grunt-devtools` in your grunt project
+* Add `grunt.loadNpmTasks('grunt-devtools');` to your `Gruntfile`
+* run `grunt devtools`
+* open Brackets, open any project folder, click on the Grunt icon in the top right corner.
 
 
 ## Updating from an older version
@@ -27,17 +38,9 @@ add-on for Chrome Dev Tools from the Chrome Web Store.
 ![](http://v14d.com/i/513393cbb7e8b.jpg)
 ![](http://v14d.com/i/5133941ceb6b4.jpg)
 
-## Dev Setup
+## Development Setup
 
-### Chrome Extension
-
-Load unpacked extension from the `extension` folder.
-
-### Grunt Plugin Installation
-
-* Locally install the plugin using `npm install [folder]/grunt-plugin`
-* Add `grunt.loadNpmTasks('grunt-devtools');` to your `Gruntfile`
-* run `grunt devtools`
+See the [contributing guide](contributing.md) for local development instructions.
 
 ## Issues
 
@@ -60,6 +63,7 @@ If issues still occur - [report it](https://github.com/vladikoff/grunt-devtools/
 
 ## Release History
 
+* 0.1.1 -
 * 0.1.0.7 - Fixes, added update warnings.
 * 0.1.0.6 - Various fixes.
 * 0.1.0.5 - Updating UI, Adding a way to set flags `--force` and `--verbose`, output fixes, background task updates.

@@ -267,24 +267,26 @@ button {
   left: 0;
 }
 
-.running #tasks .task:hover {
-  cursor: not-allowed;
-}
+.running {
+  #tasks .task:hover {
+    cursor: not-allowed;
+  }
 
-.running #tasks .active-task .b, #backgroundTasks li .b {
-  display: block;
-}
+  #tasks .active-task .b, #backgroundTasks li .b {
+    display: block;
+  }
 
-.running #tasks .task {
-  opacity: 0.3;
-}
+  #tasks .task {
+    opacity: 0.3;
+  }
 
-.running #tasks .active-task{
-  opacity: 1;
-}
+  #tasks .active-task{
+    opacity: 1;
+  }
 
-.running #running {
-  display: block;
+  #running {
+    display: block;
+  }
 }
 
 #updateWarning {
@@ -297,10 +299,10 @@ button {
   border-bottom: none;
   background: -webkit-linear-gradient(top, #fefcea 0%,#f1da36 100%);
   font-size: 10px;
-}
 
-#updateWarning p {
-  padding: 0 10px;
+  p {
+    padding: 0 10px;
+  }
 }
 
 @media all and (max-width: 250px) {

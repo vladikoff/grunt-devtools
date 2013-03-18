@@ -10,3 +10,4 @@ Thanks to:
 * Tim Branyen [https://github.com/tbranyen](https://github.com/tbranyen)
 * Dan Heberden [https://github.com/danheberden](https://github.com/danheberden)
 * Ricky Miller [https://github.com/rmillr](https://github.com/rmillr)
+* Sasha Mazurov [https://github.com/mazurov](https://github.com/mazurov)

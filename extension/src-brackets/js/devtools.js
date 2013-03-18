@@ -1,11 +1,6 @@
 'use strict';
 
-const MAX_CONNECTIONS = 5;
-const CONNECTION_PORT = 61749;
-
-// Chrome extension
-var manifest = chrome.runtime.getManifest(),
-  extVersion = manifest.version;
+var extVersion = manifest.version;
 
 // Grunt project setting
 var socket,
@@ -13,15 +8,33 @@ var socket,
   currentProject;
 
 // Port settings
-var startPort = CONNECTION_PORT,
+var startPort = 61749,
   currentPort = startPort,
-  maxPort = currentPort + MAX_CONNECTIONS;
+  maxPort = currentPort + 5;
 
 // Templates
-var projectListTpl = JST['extension/src/templates/project-list.html'],
-  taskListTpl = JST['extension/src/templates/task-list.html'],
-  bgTasksTpl = JST['extension/src/templates/background-task-list.html'];
+var projectListTpl = _.template("<% if (typeof(projects) != 'undefined') { %><% _.each(projects, function(project, i) { %><% if ((project) != null) { %><button value='<%= i %>'><%= project.name %></button>"+
+    "<% } %><% }); %><% } %>"),
+  taskListTpl = _.template(
+    "<% if (typeof(buttons) != 'undefined') { %>"+
+"<% _.each(buttons, function(name) { %>"+
+"<li>"+
+" <% if (typeof(name) != 'undefined') { %>"+
+"     <button class='task' value='<%= name %>'><%= name %></button>"+
+"     <% } %>"+
+""+
+"      <button title='Set --verbose' class='b b-second b-flag b-verbose' value='-v'>V</button>"+
+"      <button title='Set --force' class='b b-first b-flag b-force' value='-f'>F</button>"+
+""+
+"      <button title='Add to Background Tasks' class='b b-second b-bg'>B</button>"+
+"      <button title='Kill Task' class='b b-first b-kill'>X</button>"+
+"    </li>"+
+"    <% }); %>"+
+"  <% } %>"
 
+  ),
+  bgTasksTpl = _.template($("#bgTaskList").html());
+  console.log($("#projectList").html());
 // UI Selectors
 var $output = $("#placeOutput"),
   $outputWrap = $('#output'),
@@ -73,19 +86,12 @@ function handleSocketOpen(e) {
  * Handle socket message for an event
  */
 function handleSocketMessage(event) {
-  var data = event.data,
-    action = false;
+  var data = event.data;
 
   // TODO: please fix this later, this will handle most actions via JSON
   try {
     data = JSON.parse(event.data);
-    action = true;
-  } catch (e) {
-  }
-
-  // if we got a specific action
-  if (action && data) {
-    if (data.project) {
+    if (data && data.project) {
       // connecting a new project
       // add this new project
       projects.push({
@@ -98,15 +104,13 @@ function handleSocketMessage(event) {
         running: false,
         devtoolsVersion: data.devtoolsVersion
       });
-
       // add new project button
       updateProjectList();
-
       // set to current to latest, if not running
       setProject(projects.length - 1);
     }
     // process done
-    else if (data.action === 'done') {
+    else if (data && data.action === 'done') {
       currentProject.tasks = _.reject(currentProject.tasks, function (task) {
         return task.pid === data.pid;
       });
@@ -115,16 +119,14 @@ function handleSocketMessage(event) {
       enableActivity();
     }
     // process started
-    else if (data.action === 'start') {
+    else if (data && data.action === 'start') {
       currentProject.currentTask = {name: data.name, pid: data.pid, output: []};
       currentProject.tasks.push(currentProject.currentTask);
       updateTaskList();
     }
-  }
-  // just regular stdout from a task
-  else {
-    // TODO: this can be done with an action
-    if (data && data.indexOf('Running Task:') === 0) {
+  } catch (e) {
+    // new task
+    if (data.indexOf('Running Task:') === 0) {
       $output.html('');
     } else if (data.length > 1) {
       if (currentProject.tasks.length > 0) {
@@ -148,7 +150,6 @@ function handleSocketMessage(event) {
           $output.append(output);
           $outputWrap.scrollTop($output.height());
         }
-
       }
     }
   }
@@ -196,6 +197,7 @@ function handleSocketError() {
 
 function updateProjectList() {
   // update project list
+
   $projects.html(projectListTpl(projects));
 }
 
@@ -239,8 +241,10 @@ function setProject(idx) {
   var buttons = $projects.find('button');
   buttons.removeClass('active');
   $(buttons.get(idx)).addClass('active');
+
   // check version
-  if (currentProject.devtoolsVersion == null || currentProject.devtoolsVersion.replace(/-/g, '.') !== extVersion) {
+  if (currentProject &&
+    (currentProject.devtoolsVersion == null || currentProject.devtoolsVersion.replace(/-/g, '.') !== extVersion)) {
     $warning.addClass('show');
   } else {
     $warning.removeClass('show');

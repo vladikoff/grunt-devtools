@@ -1,0 +1,11 @@
+<% _.each(buttons, function(name) { %>
+<li>
+  <button class='task' value='<%= name %>'><%= name %></button>
+
+  <button title='Set --verbose' class='b b-second b-flag b-verbose' value='-v'>V</button>
+  <button title='Set --force' class='b b-first b-flag b-force' value='-f'>F</button>
+
+  <button title='Add to Background Tasks' class='b b-second b-bg'>B</button>
+  <button title='Kill Task' class='b b-first b-kill'>X</button>
+</li>
+<% }); %>
