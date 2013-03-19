@@ -3,9 +3,8 @@
 const MAX_CONNECTIONS = 5;
 const CONNECTION_PORT = 61749;
 
-// Chrome extension
-var manifest = chrome.runtime.getManifest(),
-  extVersion = manifest.version;
+// Extension version, comes from runtime
+var extVersion = manifest.version;
 
 // Grunt project setting
 var socket,
@@ -20,12 +19,17 @@ var startPort = CONNECTION_PORT,
 // Templates
 var projectListTpl = JST['extension/src/templates/project-list.html'],
   taskListTpl = JST['extension/src/templates/task-list.html'],
-  bgTasksTpl = JST['extension/src/templates/background-task-list.html'];
+  bgTasksTpl = JST['extension/src/templates/background-task-list.html'],
+  panelTpl = JST['extension/src/templates/panel-tpl.html'];
+
+// Setup main view
+var $body = $('body'),
+  $panel = $('#panel');
+$panel.html(panelTpl({}));
 
 // UI Selectors
 var $output = $("#placeOutput"),
   $outputWrap = $('#output'),
-  $body = $('body'),
   $tasks = $('#tasks'),
   $bgSection = $('#backgroundTasks'),
   $bgTasks = $('#placeBackgroundTasks'),
@@ -240,7 +244,7 @@ function setProject(idx) {
   buttons.removeClass('active');
   $(buttons.get(idx)).addClass('active');
   // check version
-  if (currentProject.devtoolsVersion == null || currentProject.devtoolsVersion.replace(/-/g, '.') !== extVersion) {
+  if (currentProject && (currentProject.devtoolsVersion == null || currentProject.devtoolsVersion.replace(/-/g, '.') !== extVersion)) {
     $warning.addClass('show');
   } else {
     $warning.removeClass('show');
@@ -267,6 +271,7 @@ connect();
 /**
  * Button Events
  */
+
 
 // execute task
 $tasks.on('click', '.task', function () {

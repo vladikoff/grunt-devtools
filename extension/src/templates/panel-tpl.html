@@ -1,14 +1,3 @@
-<!doctype html>
-<html>
-<head>
-  <script>
-    console.log(document);
-    console.log(window);
-  </script>
-  <link rel='stylesheet' href='<%= css %>'>
-  <link rel='stylesheet' href='<%= cssSkin %>'>
-</head>
-<body>
 <header id='projects'>
   <h2>Projects</h2>
   <div id='placeProjects'></div>
@@ -39,23 +28,5 @@
     <div id='placeOutput'></div>
   </section>
 </div>
-<section id='notice'>
-  <p>
-    <img src='img/icon128.png' alt='Grunt'/><br/>
-    <small>Grunt Devtools <span id='toolsVersion'></span></small><br/>
-    <strong>No projects detected.</strong>
-  </p>
-  <p><small>Is <code>grunt devtools</code> running?</small></p>
-</section>
 
 <progress id='running'></progress>
-
-
-
-
-<script src='<%= runtime %>'></script>
-<script src='<%= jquery %>'></script>
-<script src='<%= lodash %>'></script>
-<script src='<%= devtoolsScript %>'></script>
-</body>
-</html>

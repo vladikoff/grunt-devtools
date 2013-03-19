@@ -4,46 +4,16 @@
     <link rel='stylesheet' href='css/devtools.css'>
   </head>
   <body>
-    <header id='projects'>
-      <h2>Projects</h2>
-      <div id='placeProjects'></div>
-    </header>
-    <div id='tools'>
-      <aside id='updateWarning'>
-        <p>
-          The version of <code>grunt-devtools</code> does not match for this project.
-          Please update using '<code>npm install grunt-devtools --save-dev</code>' or update the extension.
-        </p>
-      </aside>
-      <section id='tasks'>
-        <div id='backgroundTasks'>
-          <header><h2>Background Tasks</h2></header>
-          <ul id='placeBackgroundTasks'></ul>
-        </div>
+  <section id='panel'></section>
+  <section id='notice'>
+    <p>
+      <img src='../img/icon128.png' alt='Grunt'/><br/>
+      <small>Grunt Devtools <span id='toolsVersion'></span></small><br/>
+      <strong>No projects detected.</strong>
+    </p>
+    <p><small>Is <code>grunt devtools</code> running?</small></p>
+  </section>
 
-        <header><h2>Alias Tasks</h2></header>
-        <ul id='placeAliasTasks'></ul>
-
-        <header><h2>Tasks</h2></header>
-        <ul id='placeTasks'></ul>
-      </section>
-      <section id='output'>
-        <header>
-          <h2>Output</h2>
-        </header>
-        <div id='placeOutput'></div>
-      </section>
-    </div>
-    <section id='notice'>
-      <p>
-        <img src='img/icon128.png' alt='Grunt'/><br/>
-        <small>Grunt Devtools <span id='toolsVersion'></span></small><br/>
-        <strong>No projects detected.</strong>
-      </p>
-      <p><small>Is <code>grunt devtools</code> running?</small></p>
-    </section>
-
-    <progress id='running'></progress>
 
     <script src='js/devtools.js'></script>
   </body>

@@ -18,7 +18,7 @@ define(function (require, exports, module) {
 
   // Local modules
   var frameHTML = require("text!frame.html"),
-    panelHTML = require("text!templates/panel.html");
+    panelHTML = require("text!panel.html");
   // jQuery objects
   var $icon,
     $iframe,
@@ -41,12 +41,10 @@ define(function (require, exports, module) {
       var panelTpl = _.template(panelHTML);
 
       var panelData = {
-        css: require.toUrl("./css/devtools.css"),
-        cssSkin: require.toUrl("./css/devtools-brackets.css"),
-        jquery: require.toUrl("./js/vendor/jquery.min.js"),
-        runtime: require.toUrl("./js/runtime.js"),
-        lodash: require.toUrl("./js/vendor/lodash.min.js"),
-        devtoolsScript: require.toUrl("./js/devtools.js")
+        css: require.toUrl('./css/devtools.css'),
+        icon128: require.toUrl('./img/icon128.png'),
+        cssSkin: require.toUrl('./css/devtools-brackets.css'),
+        devtoolsSrc: require.toUrl('./js/devtools.js')
       };
 
       $iframe.attr("srcdoc", panelTpl(panelData));
@@ -73,21 +71,22 @@ define(function (require, exports, module) {
     if (isVisible) {
       if (!$panel) {
         $panel = $(frameHTML);
-        $iframe = $panel.find("#panel-markdown-preview-frame");
+        $iframe = $panel.find('#panel-grunt-devtools-frame');
 
-        $panel.insertBefore("#status-bar");
-        Resizer.makeResizable($panel.get(0), "vert", "top", 100, false);
-        $panel.on("panelResizeUpdate", function (e, newSize) {
-          $iframe.attr("height", newSize);
+        $panel.insertBefore('#status-bar');
+        // make panel resizeable
+        Resizer.makeResizable($panel.get(0), 'vert', 'top', 26, false);
+        $panel.on('panelResizeUpdate', function (e, newSize) {
+          $iframe.attr('height', newSize);
         });
-        $iframe.attr("height", $panel.height());
+        $iframe.attr('height', $panel.height());
         window.setTimeout(_resizeIframe);
       }
       _loadDoc(DocumentManager.getCurrentDocument());
-      $icon.toggleClass("active");
+      $icon.toggleClass('active');
       $panel.show();
     } else {
-      $icon.toggleClass("active");
+      $icon.toggleClass('active');
       $panel.hide();
     }
     EditorManager.resizeEditor();
@@ -95,7 +94,7 @@ define(function (require, exports, module) {
 
   function _currentDocChangedHandler() {
     var doc = DocumentManager.getCurrentDocument(),
-      ext = doc ? PathUtils.filenameExtension(doc.file.fullPath).toLowerCase() : "";
+      ext = doc ? PathUtils.filenameExtension(doc.file.fullPath).toLowerCase() : '';
 
     if (currentDoc) {
       //$(currentDoc).off("change", _documentChange);
@@ -105,17 +104,17 @@ define(function (require, exports, module) {
     if (doc) {
       currentDoc = doc;
       //$(currentDoc).on("change", _documentChange);
-      $icon.css({display: "inline-block"});
+      $icon.css({display: 'inline-block'});
       _setPanelVisibility(visible);
       _loadDoc(doc);
     } else {
-      $icon.css({display: "none"});
+      $icon.css({display: 'none'});
       _setPanelVisibility(false);
     }
   }
 
   function _enableGruntFromProject() {
-    var $fileContainer = $("#project-files-container"),
+    var $fileContainer = $('#project-files-container'),
       gFile = $fileContainer.find('a:contains("Gruntfile.coffee"),a:contains("Gruntfile.js")');
 
 
@@ -123,17 +122,17 @@ define(function (require, exports, module) {
     function connect() {
       var connectionPromise = nodeConnection.connect(true);
       connectionPromise.fail(function () {
-        console.error("[brackets-grunt-node] failed to connect to node");
+        console.error('[brackets-grunt-node] failed to connect to node');
       });
       return connectionPromise;
     }
 
     // Helper function that loads our domain into the node server
     function loadGruntDomain() {
-      var path = ExtensionUtils.getModulePath(module, "node/GruntDomain");
+      var path = ExtensionUtils.getModulePath(module, 'node/GruntDomain');
       var loadPromise = nodeConnection.loadDomains([path], true);
       loadPromise.fail(function () {
-        console.log("[brackets-grunt-node] failed to load domain");
+        console.log('[brackets-grunt-node] failed to load domain');
       });
       return loadPromise;
     }
@@ -149,7 +148,7 @@ define(function (require, exports, module) {
         memoryPromise = nodeConnection.domains.grunt.startDevtools(fullProjectPath, gruntfileName);
 
       memoryPromise.fail(function (err) {
-        console.error("[brackets-grunt-node] failed to run grunt.startDevtools", err);
+        console.error('[brackets-grunt-node] failed to run grunt.startDevtools', err);
       });
       memoryPromise.done(function (data) {
         // get the grunt button
@@ -157,7 +156,7 @@ define(function (require, exports, module) {
         // enable the button
         gruntBtn.prop('disabled', false);
 
-        console.log("[brackets-grunt-node] Pid: %d", data.pid);
+        console.log('[brackets-grunt-node] Pid: %d', data.pid);
 
         if (data.pid) {
           gruntRunning = true;
@@ -176,7 +175,7 @@ define(function (require, exports, module) {
     if (gFile.length > 0) {
       gFile
         .addClass('gruntFile')
-        .append("<button class='runGrunt'></button>")
+        .append('<button class="runGrunt"></button>')
         .on('click', '.runGrunt', function () {
           // disable button
           $(this).prop('disabled', true);
@@ -195,19 +194,19 @@ define(function (require, exports, module) {
   }
 
   // Insert CSS for this extension
-  ExtensionUtils.loadStyleSheet(module, "css/grunt-devtools-brackets-ui.css");
+  ExtensionUtils.loadStyleSheet(module, 'css/grunt-devtools-brackets-ui.css');
 
   // Add toolbar icon
-  $icon = $("<a>")
+  $icon = $('<a>')
     .attr({
-      id: "grunt-preview-icon",
-      href: "#"
+      id: 'grunt-preview-icon',
+      href: '#'
     })
     .css({
-      display: "none"
+      display: 'none'
     })
     .click(_toggleVisibility)
-    .insertAfter($("#toolbar-go-live"));
+    .insertAfter($('#toolbar-go-live'));
 
   // currentDocumentChange is *not* called for the initial document. Use
   // appReady() to set initial state.
@@ -217,7 +216,7 @@ define(function (require, exports, module) {
 
     _currentDocChangedHandler();
 
-    $(ProjectManager).on("beforeProjectClose", function() {
+    $(ProjectManager).on('beforeProjectClose', function() {
       if (gruntRunning) {
         nodeConnection.domains.grunt.stopDevtools();
       }
@@ -225,12 +224,12 @@ define(function (require, exports, module) {
       _enableGruntFromProject();
     });
 
-    $(ProjectManager).on("projectOpen", function() {
+    $(ProjectManager).on('projectOpen', function() {
       console.log('projectOpen');
       _enableGruntFromProject();
     });
 
-    $(ProjectManager).on("beforeAppClose", function() {
+    $(ProjectManager).on('beforeAppClose', function() {
       if (gruntRunning) {
         nodeConnection.domains.grunt.stopDevtools();
       }
@@ -239,5 +238,5 @@ define(function (require, exports, module) {
 
   });
 
-  $(window).on("resize", _resizeIframe);
+  $(window).on('resize', _resizeIframe);
 });

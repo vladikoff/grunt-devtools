@@ -54,20 +54,37 @@ module.exports = function (grunt) {
 
         ],
         dest: 'extension/build/build-chrome/grunt-devtools/js/devtools.js'
+      },
+      brackets: {
+        src: [
+          'extension/src/js/vendor/*.js',
+          'extension/build/build-brackets/tmp/templates.js',
+          'extension/src-brackets/js/*.js',
+          'extension/src/js/*.js'
+        ],
+        dest: 'extension/build/build-brackets/grunt-devtools/js/devtools.js'
       }
     },
 
     copy: {
       chrome: {
         files: [
-          { expand: true, cwd: 'extension/src/', src: ['*', 'css/**', 'img/**', '!less', '!templates'], dest: 'extension/build/build-chrome/grunt-devtools'},
-          { expand: true, cwd: 'extension/src-chrome/', src: ['*'], dest: 'extension/build/build-chrome/grunt-devtools'}
+          { expand: true, cwd: 'extension/src/',
+            src: ['*', 'css/**', 'img/**', '!less', '!templates'],
+            dest: 'extension/build/build-chrome/grunt-devtools'},
+          { expand: true, cwd: 'extension/src-chrome/',
+            src: ['*'],
+            dest: 'extension/build/build-chrome/grunt-devtools'}
         ]
       },
       brackets: {
         files: [
-          { expand: true, cwd: 'extension/src/', src: ['*', 'css/**', 'img/**', 'js/**', '!less', '!templates'], dest: 'extension/build/build-brackets/grunt-devtools'},
-          { expand: true, cwd: 'extension/src-brackets/', src: ['*', 'node/**', 'js/**', 'img/**', 'templates/**'], dest: 'extension/build/build-brackets/grunt-devtools'}
+          { expand: true, cwd: 'extension/src/',
+            src: ['*', 'css/**', 'img/**', 'js/vendor/**', '!less', '!templates'],
+            dest: 'extension/build/build-brackets/grunt-devtools' },
+          { expand: true, cwd: 'extension/src-brackets/',
+            src: ['*', 'node/**', 'img/**', 'js/lib/**', '!less', 'templates/**'],
+            dest: 'extension/build/build-brackets/grunt-devtools' }
         ]
       }
     },
@@ -111,7 +128,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('dev', ['watch']);
 
-  grunt.registerTask('default', ['build']);
+  grunt.registerTask('default', ['clean', 'build']);
 
   grunt.registerTask('build:chrome', [
     'copy:chrome',
@@ -123,6 +140,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build:brackets', [
     'copy:brackets',
     'jst:brackets',
+    'concat:brackets',
     'less:brackets'
   ]);
 

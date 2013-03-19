@@ -2,7 +2,7 @@
   -webkit-box-sizing: border-box;
 }
 
-html, body {
+html, body, #panel {
   height: 100%;
   width: 100%;
 }
@@ -239,12 +239,10 @@ button {
   -webkit-flex: 3 1 auto;
 }
 
-.offline #projects {
-  display: none;
-}
-
-.offline #tools {
-  display: none;
+.offline {
+  #panel {
+    display: none;
+  }
 }
 
 #notice small {

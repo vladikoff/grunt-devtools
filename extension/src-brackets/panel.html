@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head>
+  <link rel='stylesheet' href='<%= css %>'>
+  <link rel='stylesheet' href='<%= cssSkin %>'>
+</head>
+<body>
+<section id='panel'></section>
+<section id='notice'>
+  <p>
+    <img src='<%= icon128 %>' alt='Grunt'/><br/>
+    <small>Grunt Devtools <span id='toolsVersion'></span></small><br/>
+    <strong>No projects detected.</strong>
+  </p>
+  <p><small>Is <code>grunt devtools</code> running?</small></p>
+</section>
+
+<script src='<%= devtoolsSrc %>'></script>
+</body>
+</html>
