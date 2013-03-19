@@ -1,24 +1,24 @@
 /*global define, brackets, $, window, PathUtils */
 
 define(function (require, exports, module) {
-  "use strict";
+  'use strict';
 
   require('js/vendor/lodash.min');
 
   var devtools = require('js/lib/brackets-devtools');
 
   // Brackets modules
-  var AppInit = brackets.getModule("utils/AppInit"),
-    DocumentManager = brackets.getModule("document/DocumentManager"),
-    EditorManager = brackets.getModule("editor/EditorManager"),
-    ExtensionUtils = brackets.getModule("utils/ExtensionUtils"),
-    Resizer = brackets.getModule("utils/Resizer"),
-    NodeConnection = brackets.getModule("utils/NodeConnection"),
-    ProjectManager = brackets.getModule("project/ProjectManager");
+  var AppInit = brackets.getModule('utils/AppInit'),
+    DocumentManager = brackets.getModule('document/DocumentManager'),
+    EditorManager = brackets.getModule('editor/EditorManager'),
+    ExtensionUtils = brackets.getModule('utils/ExtensionUtils'),
+    Resizer = brackets.getModule('utils/Resizer'),
+    NodeConnection = brackets.getModule('utils/NodeConnection'),
+    ProjectManager = brackets.getModule('project/ProjectManager');
 
   // Local modules
-  var frameHTML = require("text!frame.html"),
-    panelHTML = require("text!panel.html");
+  var frameHTML = require('text!frame.html'),
+    panelHTML = require('text!panel.html');
   // jQuery objects
   var $icon,
     $iframe,
@@ -47,7 +47,7 @@ define(function (require, exports, module) {
         devtoolsSrc: require.toUrl('./js/devtools.js')
       };
 
-      $iframe.attr("srcdoc", panelTpl(panelData));
+      $iframe.attr('srcdoc', panelTpl(panelData));
     }
   }
 
@@ -58,7 +58,7 @@ define(function (require, exports, module) {
   function _resizeIframe() {
     if (visible && $iframe) {
       var iframeWidth = $panel.innerWidth();
-      $iframe.attr("width", iframeWidth + "px");
+      $iframe.attr('width', iframeWidth + 'px');
     }
   }
 

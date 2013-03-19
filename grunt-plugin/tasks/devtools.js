@@ -75,7 +75,7 @@ module.exports = function (grunt) {
               taskName = cmd[0];
 
             // add no color option
-            cmd.push('-no-color');
+            //cmd.push('-no-color');
 
             // brackets env
             if (grunt.option('env') === 'brackets') {
