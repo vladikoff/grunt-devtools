@@ -47,7 +47,7 @@
             //console.log(data.toString());
           }
         });
-        return {pid: currentProcess.pid};
+        return { pid: currentProcess.pid };
       } else {
         return { pid: null };
       }
