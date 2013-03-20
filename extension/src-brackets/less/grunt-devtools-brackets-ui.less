@@ -27,20 +27,36 @@ Used for the extension icon and extension integration.
   opacity: .75;
 }
 
-.gruntFile {
+.grunt-devtools-file {
   position: relative;
 }
 
-.runGrunt {
+.grunt-devtools-run {
   position: absolute;
-  right: 20px;
-  top: 5px;
-  width: 13px;
-  height: 13px;
-  background: none;
+  left: -8px;
+  top: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 15px;
-  border: 2px solid #e48731;
+  background: #E48731;
 }
-.runGrunt.running {
-  background: #e48731;
+.grunt-devtools-run.running {
+  opacity: 0.3;
+}
+
+#panel-grunt-devtools {
+  position: relative;
+}
+
+#panel-grunt-devtools-panel-control {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-family: monospace;
+  font-size: 25px;
+  color: grey;
+  background: none;
+  width: 30px;
+  padding-top: 5px;
+  height: 25px;
 }

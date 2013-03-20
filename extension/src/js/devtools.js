@@ -166,9 +166,10 @@ function handleSocketMessage(event) {
   var data = event.data,
     action = false;
 
-  // TODO: please fix this later, this will handle most actions via JSON
+  // try to parse the message as JSON from the socket
   try {
     data = JSON.parse(event.data);
+    // set that this a JSON action
     action = true;
   } catch (e) {
   }

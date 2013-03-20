@@ -1,14 +1,8 @@
 <header id='projects'>
-  <h2>Projects</h2>
+  <h2>Grunt Projects</h2>
   <div id='placeProjects'></div>
 </header>
 <div id='tools'>
-  <aside id='updateWarning'>
-    <p>
-      The version of <code>grunt-devtools</code> does not match for this project.
-      Please update using '<code>npm install grunt-devtools --save-dev</code>' or update the extension.
-    </p>
-  </aside>
   <section id='tasks'>
     <div id='backgroundTasks'>
       <header><h2>Background Tasks</h2></header>
@@ -22,11 +16,16 @@
     <ul id='placeTasks'></ul>
   </section>
   <section id='output'>
+    <aside id='updateWarning'>
+      <p>
+        The version of <code>grunt-devtools</code> is not valid for this project.
+        Please run'<code>npm install grunt-devtools --save-dev</code>' or update this extension.
+      </p>
+    </aside>
     <header>
       <h2>Output</h2>
     </header>
     <div id='placeOutput'></div>
   </section>
 </div>
-
 <progress id='running'></progress>

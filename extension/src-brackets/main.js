@@ -5,6 +5,7 @@ define(function (require, exports, module) {
 
   require('js/vendor/lodash.min');
 
+  // get helpers
   var devtools = require('js/lib/brackets-devtools');
 
   // Brackets modules
@@ -16,49 +17,30 @@ define(function (require, exports, module) {
     NodeConnection = brackets.getModule('utils/NodeConnection'),
     ProjectManager = brackets.getModule('project/ProjectManager');
 
-  // Local modules
+  // frame and panel templates
   var frameHTML = require('text!frame.html'),
     panelHTML = require('text!panel.html');
   // jQuery objects
   var $icon,
     $iframe,
-    $panel;
+    $extPanel,
+    $panelControl;
 
   // Other vars
   var currentDoc,
+  // Create a new node connection. Requires the following extension:
+  // https://github.com/joelrbrandt/brackets-node-client
+    nodeConnection = new NodeConnection(),
     visible = false,
     realVisibility = false,
     gruntRunning = false;
 
-  // Create a new node connection. Requires the following extension:
-  // https://github.com/joelrbrandt/brackets-node-client
-  var nodeConnection;
-
-
-
-  function _loadDoc(doc, preserveScrollPos) {
-    if (doc && visible && $iframe) {
-      var panelTpl = _.template(panelHTML);
-
-      var panelData = {
-        css: require.toUrl('./css/devtools.css'),
-        icon128: require.toUrl('./img/icon128.png'),
-        cssSkin: require.toUrl('./css/devtools-brackets.css'),
-        devtoolsSrc: require.toUrl('./js/devtools.js')
-      };
-
-      $iframe.attr('srcdoc', panelTpl(panelData));
-    }
-  }
-
-  function _documentChange(e) {
-    _loadDoc(e.target, true);
-  }
-
   function _resizeIframe() {
-    if (visible && $iframe) {
-      var iframeWidth = $panel.innerWidth();
+    if ($iframe) {
+      var iframeWidth = $extPanel.innerWidth();
+      var iframeHeight = $extPanel.outerHeight();
       $iframe.attr('width', iframeWidth + 'px');
+      $iframe.attr('height', iframeHeight + 'px');
     }
   }
 
@@ -69,54 +51,60 @@ define(function (require, exports, module) {
 
     realVisibility = isVisible;
     if (isVisible) {
-      if (!$panel) {
-        $panel = $(frameHTML);
-        $iframe = $panel.find('#panel-grunt-devtools-frame');
+      if (!$extPanel) {
+        $extPanel = $(frameHTML);
+        $iframe = $extPanel.find('#panel-grunt-devtools-frame');
+        $panelControl = $extPanel.find('#panel-grunt-devtools-panel-control');
 
-        $panel.insertBefore('#status-bar');
-        // make panel resizeable
-        Resizer.makeResizable($panel.get(0), 'vert', 'top', 26, false);
-        $panel.on('panelResizeUpdate', function (e, newSize) {
-          $iframe.attr('height', newSize);
+        $panelControl.on('click', function () {
+          _setPanelControl();
+
+          _resizeIframe();
+          EditorManager.resizeEditor();
+          $extPanel.trigger('mousemove');
         });
-        $iframe.attr('height', $panel.height());
+
+        $extPanel.insertBefore('#status-bar');
+        // make panel resizeable
+        Resizer.makeResizable($extPanel.get(0), 'vert', 'top', 26, false);
+        $extPanel.on('panelResizeUpdate', function (e, newSize) {
+          $iframe.attr('height', newSize);
+          if (newSize === 26) {
+            $panelControl.text('^');
+          } else {
+            $panelControl.text('');
+          }
+        });
+
+        $iframe.attr('height', $extPanel.height());
         window.setTimeout(_resizeIframe);
       }
-      _loadDoc(DocumentManager.getCurrentDocument());
-      $icon.toggleClass('active');
-      $panel.show();
+
+      if ($iframe) {
+        var panelTpl = _.template(panelHTML);
+
+        var panelData = {
+          css: require.toUrl('./css/devtools.css'),
+          icon128: require.toUrl('./img/icon128.png'),
+          cssSkin: require.toUrl('./css/devtools-brackets.css'),
+          devtoolsSrc: require.toUrl('./js/devtools.js')
+        };
+        $iframe.attr('srcdoc', panelTpl(panelData));
+      }
+      $extPanel.show();
+      _setPanelControl('min');
     } else {
-      $icon.toggleClass('active');
-      $panel.hide();
+      $extPanel.hide();
     }
+    //$icon.toggleClass('active');
     EditorManager.resizeEditor();
   }
 
-  function _currentDocChangedHandler() {
-    var doc = DocumentManager.getCurrentDocument(),
-      ext = doc ? PathUtils.filenameExtension(doc.file.fullPath).toLowerCase() : '';
-
-    if (currentDoc) {
-      //$(currentDoc).off("change", _documentChange);
-      currentDoc = null;
-    }
-
-    if (doc) {
-      currentDoc = doc;
-      //$(currentDoc).on("change", _documentChange);
-      $icon.css({display: 'inline-block'});
-      _setPanelVisibility(visible);
-      _loadDoc(doc);
-    } else {
-      $icon.css({display: 'none'});
-      _setPanelVisibility(false);
-    }
-  }
-
+  // run grunt from brackets via a node process
   function _enableGruntFromProject() {
     var $fileContainer = $('#project-files-container'),
-      gFile = $fileContainer.find('a:contains("Gruntfile.coffee"),a:contains("Gruntfile.js")');
-
+      gFile = $fileContainer
+        .find('a:contains("Gruntfile.coffee"),a:contains("Gruntfile.js"),a:contains("gruntfile.coffee"),a:contains("gruntfile.js")');
 
     // Helper function to connect to node
     function connect() {
@@ -142,9 +130,9 @@ define(function (require, exports, module) {
     function startDevtools() {
       // get the path to the project
       var fullProjectPath = ProjectManager.getProjectRoot().fullPath,
-        // get the name of the Gruntfile
+      // get the name of the Gruntfile
         gruntfileName = $.trim(gFile.text()),
-        // start devtools via a node connection
+      // start devtools via a node connection
         memoryPromise = nodeConnection.domains.grunt.startDevtools(fullProjectPath, gruntfileName);
 
       memoryPromise.fail(function (err) {
@@ -152,40 +140,60 @@ define(function (require, exports, module) {
       });
       memoryPromise.done(function (data) {
         // get the grunt button
-        var gruntBtn = $('.gruntFile').find('.runGrunt');
+        var gruntBtn = $('.grunt-devtools-file').parent().find('.grunt-devtools-run');
         // enable the button
         gruntBtn.prop('disabled', false);
 
-        console.log('[brackets-grunt-node] Pid: %d', data.pid);
-
         if (data.pid) {
           gruntRunning = true;
-          gruntBtn.addClass('running');
+          _setPanelVisibility(true);
         } else {
-          gruntBtn.removeClass('running');
           gruntRunning = false;
         }
       });
       return memoryPromise;
     }
 
-    console.log(gFile);
+
+    function _runDevtools() {
+      var gruntBtn = $('.grunt-devtools-file').parent().find('.grunt-devtools-run');
+      if (gruntRunning) {
+        nodeConnection.domains.grunt.stopDevtools();
+        gruntBtn.removeClass('running');
+        gruntRunning = false;
+      } else {
+        devtools.chain(connect, loadGruntDomain, startDevtools);
+        gruntBtn.addClass('running');
+        gruntRunning = true;
+      }
+    }
 
     // if found a grunt file
     if (gFile.length > 0) {
-      gFile
-        .addClass('gruntFile')
-        .append('<button class="runGrunt"></button>')
-        .on('click', '.runGrunt', function () {
-          // disable button
-          $(this).prop('disabled', true);
+      // new native connection
 
-          // new native connection
-          nodeConnection = new NodeConnection();
-          // call all the helper functions in order
-          devtools.chain(connect, loadGruntDomain, startDevtools);
+      gFile
+        .addClass('grunt-devtools-file')
+        .parent().on('click', '.grunt-devtools-run', function () {
+          _runDevtools();
         });
+
+      $('<button class="grunt-devtools-run"></button>').appendTo(gFile.first().parent());
+      _runDevtools();
     }
+  }
+
+  function _setPanelControl(sizeMode) {
+    if ($panelControl) {
+      if (sizeMode === 'min') {
+        $panelControl.text('^');
+        $extPanel.height(26);
+      } else {
+        $panelControl.text('');
+        $extPanel.height(400);
+      }
+    }
+
   }
 
   function _toggleVisibility() {
@@ -211,32 +219,32 @@ define(function (require, exports, module) {
   // currentDocumentChange is *not* called for the initial document. Use
   // appReady() to set initial state.
   AppInit.appReady(function () {
-    console.log('appReady');
     _enableGruntFromProject();
 
-    _currentDocChangedHandler();
-
-    $(ProjectManager).on('beforeProjectClose', function() {
+    // switching projects, try to enable grunt-devtools for the next project.
+    $(ProjectManager).on('beforeProjectClose', function () {
       if (gruntRunning) {
         nodeConnection.domains.grunt.stopDevtools();
+        gruntRunning = false;
       }
-      console.log('beforeProjectClose');
+      _setPanelControl('min');
       _enableGruntFromProject();
     });
 
-    $(ProjectManager).on('projectOpen', function() {
-      console.log('projectOpen');
+    // new project open, shut down current grunt
+    $(ProjectManager).on('projectOpen', function () {
       _enableGruntFromProject();
     });
 
-    $(ProjectManager).on('beforeAppClose', function() {
+    // closing brackets, make sure to close grunt-devtools
+    $(ProjectManager).on('beforeAppClose', function () {
       if (gruntRunning) {
         nodeConnection.domains.grunt.stopDevtools();
+        gruntRunning = false;
       }
-      console.log('oh deer');
     });
-
   });
 
+  // iframe resize
   $(window).on('resize', _resizeIframe);
 });

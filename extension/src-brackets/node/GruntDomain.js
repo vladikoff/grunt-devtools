@@ -1,7 +1,8 @@
 (function () {
   "use strict";
 
-  var spawn = require("child_process").spawn;
+  var spawn = require('child_process').spawn,
+    fs = require('fs');
 
   var currentProcess = null;
 
@@ -16,46 +17,40 @@
 
   function startDevtoolsHandler(path, gruntfile) {
     if (currentProcess) {
-      console.log('I already have a currentProcess with ' + currentProcess.pid);
       killWorkers();
-      return {pid: null};
+      return { pid: null };
     } else {
 
       // change into project directory
       process.chdir(path);
 
       // TODO: Windows support here, check paths
-      console.log('|' + gruntfile + '|');
-      var gruntFilePath = path + gruntfile;
-      console.log(gruntFilePath);
-      var spawnCmd = '/usr/local/bin/node';
+      var gruntFilePath = path + gruntfile,
+        spawnCmd = '/usr/local/bin/node';
 
-      var cmd = [
-        '/usr/local/bin/grunt',
-        '--gruntfile',
-        gruntFilePath,
-        '--base',
-        process.cwd(),
-        'devtools',
-        '--env',
-        'brackets'
-      ];
+      if (fs.existsSync(gruntFilePath)) {
 
-      currentProcess = spawn(spawnCmd, cmd);
-      currentProcess.stdout.on('data', function (data) {
-        if (data) {
-          console.log(data.toString());
-        }
-      });
-      /*
-       currentProcess = cp.exec(command, function (err, stdout, stderr) {
-       //console.log(stderr);
-       console.log(process.execPath);
+        var cmd = [
+          '/usr/local/bin/grunt',
+          '--gruntfile',
+          gruntFilePath,
+          '--base',
+          process.cwd(),
+          'devtools',
+          '--env',
+          'brackets'
+        ];
 
-       });
-       */
-      console.log(currentProcess.pid);
-      return {pid: currentProcess.pid};
+        currentProcess = spawn(spawnCmd, cmd);
+        currentProcess.stdout.on('data', function (data) {
+          if (data) {
+            //console.log(data.toString());
+          }
+        });
+        return {pid: currentProcess.pid};
+      } else {
+        return { pid: null };
+      }
     }
   }
 

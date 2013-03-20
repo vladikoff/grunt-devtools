@@ -20,7 +20,7 @@ module.exports = function (grunt) {
     var projectPath = process.cwd().split('/'),
       projectName = projectPath[projectPath.length - 1],
       aliasTasks = getAliasTasks(),
-      allTasks = grunt.util._.without(Object.keys(grunt.task._tasks),'devtools'),
+      allTasks = grunt.util._.without(Object.keys(grunt.task._tasks), 'devtools'),
       basicTasks = grunt.util._.difference(allTasks, aliasTasks);
 
     var server = http.createServer(function (request, response) {
@@ -188,36 +188,5 @@ module.exports = function (grunt) {
       }
       return aliasTasks;
     }
-
-    // extra feature to cli from stdin
-    var stdin = process.stdin;
-
-    if (typeof stdin.setRawMode === 'function') {
-
-      // without this, we would only get streams once enter is pressed
-      stdin.setRawMode(true);
-
-      // resume stdin in the parent process (node app won't quit all by itself
-      // unless an error or process.exit() happens)
-      stdin.resume();
-
-      // i don't want binary, do you?
-      stdin.setEncoding('utf8');
-
-      // on any data into stdin
-      stdin.on('data', function (key) {
-
-        if (key === '\n') {
-          process.stdout.write('ENTER');
-        }
-        // ctrl-c ( end of text )
-        if (key === '\u0003') {
-          process.exit();
-        }
-        // write the key to stdout all normal like
-        process.stdout.write(key);
-      });
-    }
-
   });
 };
