@@ -74,8 +74,10 @@ module.exports = function (grunt) {
             // task name we want to run
               taskName = cmd[0];
 
-            // add no color option
-            //cmd.push('-no-color');
+            // if Windows, we need to add cmd to spawn properly
+            if (process.platform === 'win32') {
+              spawnCmd = 'grunt.cmd';
+            }
 
             // brackets env
             if (grunt.option('env') === 'brackets') {

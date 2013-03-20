@@ -7,8 +7,7 @@ const CONNECTION_PORT = 61749;
 var extVersion = manifest.version;
 
 // Grunt project setting
-var socket,
-  projects = [],
+var projects = [],
   currentProject;
 
 // Port settings
@@ -137,7 +136,7 @@ function connect() {
   if (!exists) {
     var socketAddr = 'ws://localhost:' + currentPort;
 
-    socket = new WebSocket(socketAddr, 'echo-protocol');
+    var socket = new WebSocket(socketAddr, 'echo-protocol');
     socket.onopen = handleSocketOpen;
     socket.onmessage = handleSocketMessage;
     socket.onclose = handleSocketClose;
@@ -156,7 +155,7 @@ function connect() {
  */
 function handleSocketOpen(e) {
   $body.removeClass('offline').addClass('online');
-  socket.send('handleSocketOpen');
+  this.send('handleSocketOpen');
 }
 
 /**
@@ -182,7 +181,8 @@ function handleSocketMessage(event) {
       projects.push({
         name: data.project,
         port: parseInt(data.port),
-        socket: socket,
+        // this socket from handleSocketMessage
+        socket: this,
         taskListAlias: data.alias,
         taskListGeneric: data.tasks,
         tasks: [],
