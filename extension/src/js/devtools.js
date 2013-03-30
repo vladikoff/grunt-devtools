@@ -450,6 +450,7 @@ $tasks.on('click', '.b-kill', function () {
     // TODO BUG: fix flow of killing tasks.
     updateTaskList();
   }
+
   currentProject.socket.send(JSON.stringify({
     action: 'killTask',
     task: taskInfo

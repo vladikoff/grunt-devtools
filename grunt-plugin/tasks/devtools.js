@@ -9,6 +9,7 @@ module.exports = function (grunt) {
     var WebSocketServer = require('websocket').server,
       fs = require("fs"),
       spawn = require("child_process").spawn,
+      exec = require("child_process").exec,
       http = require('http'),
       portscanner = require('portscanner');
 
@@ -78,7 +79,15 @@ module.exports = function (grunt) {
               workers.forEach(function (worker) {
                 if (worker.pid === msg.task.pid) {
                   connection.send(worker.pid + '|' + 'Task Killed: ' + msg.task.name);
-                  worker.kill();
+                  // TODO: update this
+                  // TODO: Also need to clean up tmp directory here.
+                    if (process.platform === 'win32') {
+                        exec('taskkill /pid ' + worker.pid + ' /T /F');
+                    } else {
+                        worker.kill();
+                    }
+                    connection.sendUTF(JSON.stringify({ action: 'done', pid: worker.pid }));
+                    workers = grunt.util._.reject(workers, function(w) { return w.pid === worker.pid});
                 }
               });
             }
@@ -91,12 +100,21 @@ module.exports = function (grunt) {
             // task name we want to run
               taskName = cmd[0];
 
-            // if Windows, we need to add cmd to spawn properly
+            // if Windows  need to change a few things
             if (process.platform === 'win32') {
+              // add cmd to spawn properly
               spawnCmd = 'grunt.cmd';
+              // Windows is not getting colours, due to the bug below
+              cmd.push('-no-color');
+              // TODO BUG: On Windows we need to run through a temp file
+              // https://github.com/joyent/node/issues/3584
+              var pipeFile = 'node_modules\\grunt-devtools-' + workers.length + '.tmp',
+                pipeTmp = '> ' + pipeFile + ' & type ' + pipeFile + ' & del ' + pipeFile;
+              // add tmp pipe to the command
+              cmd = cmd.concat(pipeTmp.split(' '));
             }
 
-            // brackets env
+            // if running in Adobe Brackets env
             if (grunt.option('env') === 'brackets') {
               // need a full node path
               spawnCmd = '/usr/local/bin/node';
@@ -144,16 +162,18 @@ module.exports = function (grunt) {
                 if (code !== 0) {
                   connection.send(watcher.pid + '|' + 'Process Exited with code: ' + code);
                 }
+                // TODO BUG: need to clean up 'workers' here
               });
             }
           }
         }
       });
+
+      // when this session ends stop all workers
       connection.on('close', function () {
-        killWorkers(key);
+        killWorkers();
       });
     });
-
 
     /**
      * Clean up child processes
@@ -161,13 +181,27 @@ module.exports = function (grunt) {
     var killWorkers = function (key) {
       workers.forEach(function (worker) {
         if (key) {
-          if (worker.key === key) {
-            worker.kill();
+          if (worker.key === key || worker.pid === key) {
+              // TODO: update
+              if (process.platform === 'win32') {
+                  exec('taskkill /pid ' + worker.pid + ' /T /F');
+              } else {
+                  worker.kill();
+              }
           }
         } else {
-          process.kill(worker);
+            // TODO: update
+            if (process.platform === 'win32') {
+                exec('taskkill /pid ' + worker.pid + ' /T /F');
+            } else {
+                process.kill(worker.pid);
+            }
         }
       });
+
+      if (key) {
+        workers = grunt.util._.reject(workers, function(w) { return w.key === key || w.pid === key });
+      }
 
       if (!key) {
         process.exit();
