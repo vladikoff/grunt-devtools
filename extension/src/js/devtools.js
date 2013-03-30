@@ -222,8 +222,11 @@ function handleSocketMessage(event) {
         var msg = data.split("|"),
           pid = msg[0],
           timestamp = new Date().toString().split(' ')[4],
-          output = '<pre><span class="theme-timestamp">' + timestamp + '</span> - ' + colorize(_.escape(msg[1])) + '</pre>';
+          output = '';
 
+        if (msg[1].length > 1) {
+          output = '<pre><span class="theme-timestamp">' + timestamp + '</span> - ' + colorize(_.escape(msg[1])) + '</pre>';
+        }
         // find a task with a process id of the message
         var pidTask = _.find(currentProject.tasks, function (task) {
           return task.pid === parseInt(pid);
@@ -291,30 +294,47 @@ function updateProjectList() {
 }
 
 function updateTaskList() {
-  // set the tasks
+  // set the tasks templates
   $regularTasks.html(taskListTpl({buttons: currentProject.taskListGeneric}));
   $aliasTasks.html(taskListTpl({buttons: currentProject.taskListAlias}));
 
+  // if running a task at this moment
+  // we need this condition because we might come back to this project
+  // and we need to show that the task is running
   if (currentProject.currentTask) {
+    // find the task in the list with the current task name
     $('.task[value="' + currentProject.currentTask.name + '"]')
+      // set the task kill button pid
       .siblings('.b-kill').data('pid', currentProject.currentTask.pid).end()
+      // set that this is an active task
       .parent().addClass('active-task');
   }
 
+  // check the list of background tasks
   var bgTasks = currentProject.tasks;
+  // if running a task
   if (currentProject.currentTask) {
+    // exclude the task that is running right now from all task
+    // so we get a true background taks list
     bgTasks = _.reject(currentProject.tasks, function (task) {
       return task.pid === currentProject.currentTask.pid;
     });
   }
 
+  // if there are background tasks
   if (bgTasks.length > 0) {
+    // show the background task header
     $bgSection.addClass('show');
+    // populate the background task list
     $bgTasks.html(bgTasksTpl({tasks: bgTasks}));
-  } else {
+  }
+  // else no tasks in the background
+  else {
+    // hides the background task header
     $bgSection.removeClass('show');
   }
 
+  // if the project is running, we need to set the running stage
   if (currentProject.running) {
     $('#tasks .task, #projects .task').prop('disabled', true);
   }
@@ -322,12 +342,12 @@ function updateTaskList() {
 
 function setProject(idx) {
   // if not running, change the active project. Otherwise it stays the same
-
   // TODO: bug here, need to check if the task is running
   // get project by index
   currentProject = projects[idx];
   // update project tab style
   var buttons = $projects.find('button');
+
   buttons.removeClass('active');
   $(buttons.get(idx)).addClass('active');
   // check version
@@ -419,11 +439,15 @@ $tasks.on('click', '.b-kill', function () {
 
   // if there's a pid, use it instead
   if (btn.data('pid')) {
-    taskInfo = {name: btn.val(), pid: btn.data('pid')};
-    // TODO: validate this?
+    taskInfo = {name: btn.siblings('.task').val(), pid: btn.data('pid')};
+    // update the tasks list for the current project, leaving only those that
+    // do not match the pid of the button
     currentProject.tasks = _.reject(currentProject.tasks, function (task) {
       return task.pid === btn.data('pid');
     });
+
+    // TODO: validate this? validate that the process was killed ?
+    // TODO BUG: fix flow of killing tasks.
     updateTaskList();
   }
   currentProject.socket.send(JSON.stringify({

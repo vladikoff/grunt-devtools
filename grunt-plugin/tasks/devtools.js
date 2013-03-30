@@ -3,24 +3,37 @@
 module.exports = function (grunt) {
 
   grunt.registerTask('devtools', 'Runs a server for devtools', function () {
-    this.async(); // run forever
-    var WebSocketServer = require('websocket').server;
+    // run forever until the user kills the task
+    this.async();
 
-    var fs = require("fs"),
+    var WebSocketServer = require('websocket').server,
+      fs = require("fs"),
       spawn = require("child_process").spawn,
       http = require('http'),
       portscanner = require('portscanner');
 
+    // collects all process workers
     var workers = [];
 
-    var pjson = require('../package.json'),
-      version = pjson.version;
+    var pkg = require('../package.json'),
+      version = pkg.version;
 
-    // TODO: update this
-    var projectPath = process.cwd().split('/'),
+    // set path split character
+    var splitChar = '/';
+    // on Windows we need a different path split
+    if (process.platform === 'win32') splitChar = '\\';
+
+    var
+      // split the project path
+      projectPath = process.cwd().split(splitChar),
+      // get the project name from the last piece in the path
       projectName = projectPath[projectPath.length - 1],
+      // get alias tasks from the Gruntfile
+      // TODO: update this
       aliasTasks = getAliasTasks(),
+      // get all tasks from grunt.task, exclude the devtools task
       allTasks = grunt.util._.without(Object.keys(grunt.task._tasks), 'devtools'),
+      // basic tasks are the difference between alias and all tasks
       basicTasks = grunt.util._.difference(allTasks, aliasTasks);
 
     var server = http.createServer(function (request, response) {
@@ -29,10 +42,14 @@ module.exports = function (grunt) {
     });
 
     // TODO: update this
+    // set start port
     var projectPort = 61750;
+    // use portscanner to find a suitable port for this project
     portscanner.findAPortNotInUse(projectPort, projectPort + 4, 'localhost', function (error, port) {
       projectPort = port;
+      // if we found a good port
       if (projectPort) {
+        // start the server on that port
         server.listen(port, function () {
           grunt.log.ok("Grunt Devtools v" + version + " is ready! Proceed to the Chrome extension.");
         });
