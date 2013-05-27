@@ -54,13 +54,6 @@ If issues still occur - [report it](https://github.com/vladikoff/grunt-devtools/
 
 * Background tasks disappear when done
 
-## TODO
-
-* Test Windows
-* support 'gruntfile.js' and 'gruntfile.coffee' lowercased.
-* registerMultiTask support
-* send tasks into background right away
-
 ## Release History
 
 * 0.1.1 -
