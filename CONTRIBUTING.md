@@ -45,3 +45,12 @@ create a symlink via `ln -s ~/NodeProjects/grunt-devtools/extension/build/build-
 After you made some changes, you can run `grunt build` to build both extensions.
 Use `grunt watch` to automatically watch for that.
 Then to reload the extension
+
+
+## Project TODO
+
+* Test Windows
+* support 'gruntfile.js' and 'gruntfile.coffee' lowercased.
+* registerMultiTask support
+* send tasks into background right away
+
