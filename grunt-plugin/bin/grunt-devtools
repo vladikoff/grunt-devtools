@@ -1,0 +1,18 @@
+#!/usr/bin/env node
+
+'use strict';
+
+var resolve = require('resolve').sync;
+
+var path = require('path');
+var basedir = process.cwd();
+var gruntpath;
+
+try {
+    gruntpath = resolve('grunt', {basedir: basedir});
+} catch (ex) {
+    console.log('grunt-devtools error');
+    console.log(ex);
+}
+
+require(gruntpath).cli();

@@ -12,6 +12,10 @@ module.exports = function(grunt) {
       gruntfile: {
           files: 'Gruntfile.js',
           tasks: ['clean']
+      },
+      all: {
+          files: '*',
+          tasks: ['clean']
       }
     }
   });
