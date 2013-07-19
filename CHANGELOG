@@ -1,8 +1,10 @@
-v0.1.1
+v0.2.0
+    - adding global support via `npm install -g grunt-devtools`
+    - adding target support in the UI
     - added color log support
     - style and formatting fixes
+    - other bug fixes
     - adding experimental Brackets support
-    - global ...
 v0.1.0.7
     - Fixes, added update warnings.
 v0.1.0.6

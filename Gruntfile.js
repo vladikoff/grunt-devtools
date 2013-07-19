@@ -24,9 +24,7 @@ module.exports = function (grunt) {
     },
 
     // Before generating any new files, remove any previously-created files.
-    clean: {
-      all: ['tmp', 'extension/build']
-    },
+    clean: ['tmp', 'extension/build'],
 
     jst: {
       chrome: {
@@ -106,6 +104,9 @@ module.exports = function (grunt) {
 
     watch: {
       extension: {
+        options: {
+          atBegin: true
+        },
         files: [
           'extension/src/**/*',
           'extension/src-chrome/**/*',

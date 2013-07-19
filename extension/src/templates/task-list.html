@@ -1,6 +1,6 @@
-<% _.each(buttons, function(name) { %>
+<% _.each(buttons, function(task) { %>
 <li>
-  <button class='task' value='<%= name %>'><%= name %></button>
+  <button class='task' value='<%= task.name %>'><%= task.name %></button>
 
   <button title='Set --verbose' class='b b-second b-flag b-verbose' value='-v'>V</button>
   <button title='Set --force' class='b b-first b-flag b-force' value='-f'>F</button>

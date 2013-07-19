@@ -15,7 +15,6 @@ module.exports = function (grunt) {
 
     // collects all process workers
     var workers = [];
-
     var pkg = require('../package.json'),
       version = pkg.version;
 
@@ -24,18 +23,23 @@ module.exports = function (grunt) {
     // on Windows we need a different path split
     if (process.platform === 'win32') splitChar = '\\';
 
-    var
-      // split the project path
-      projectPath = process.cwd().split(splitChar),
-      // get the project name from the last piece in the path
-      projectName = projectPath[projectPath.length - 1],
-      // get alias tasks from the Gruntfile
-      // TODO: update this
-      aliasTasks = getAliasTasks(),
-      // get all tasks from grunt.task, exclude the devtools task
-      allTasks = grunt.util._.without(Object.keys(grunt.task._tasks), 'devtools'),
-      // basic tasks are the difference between alias and all tasks
-      basicTasks = grunt.util._.difference(allTasks, aliasTasks);
+    // split the project path
+    var projectPath = process.cwd().split(splitChar);
+    // get the project name from the last piece in the path
+    var projectName = projectPath[projectPath.length - 1];
+    // get alias tasks from the Gruntfile
+    // TODO: update this
+    var allTasks = [];
+    if (grunt.option('core') && grunt.option('alias')) {
+      allTasks.core = JSON.parse(grunt.option('core'));
+      allTasks.alias = JSON.parse(grunt.option('alias'));
+    } else {
+      allTasks = require('../lib/local').init(grunt).getTasks();
+    }
+
+    var aliasTasks = allTasks.core;
+    var basicTasks = allTasks.alias;
+    var allTasks = allTasks.core.concat(allTasks.alias);
 
     var server = http.createServer(function (request, response) {
       response.writeHead(404);
@@ -70,6 +74,7 @@ module.exports = function (grunt) {
       connection.on('message', function (message) {
         if (message.type === 'utf8') {
           var msg = message.utf8Data;
+
           try {
             msg = JSON.parse(message.utf8Data);
           } catch (e) {
@@ -81,24 +86,25 @@ module.exports = function (grunt) {
                   connection.send(worker.pid + '|' + 'Task Killed: ' + msg.task.name);
                   // TODO: update this
                   // TODO: Also need to clean up tmp directory here.
-                    if (process.platform === 'win32') {
-                        exec('taskkill /pid ' + worker.pid + ' /T /F');
-                    } else {
-                        worker.kill();
-                    }
-                    connection.sendUTF(JSON.stringify({ action: 'done', pid: worker.pid }));
-                    workers = grunt.util._.reject(workers, function(w) { return w.pid === worker.pid});
+                  if (process.platform === 'win32') {
+                    exec('taskkill /pid ' + worker.pid + ' /T /F');
+                  } else {
+                    worker.kill();
+                  }
+                  connection.sendUTF(JSON.stringify({ action: 'done', pid: worker.pid }));
+                  workers = grunt.util._.reject(workers, function (w) {
+                    return w.pid === worker.pid
+                  });
                 }
               });
             }
           } else {
-
             // get the command from the request
-            var cmd = msg.split(' '),
+            var cmd = msg.split(' ');
             // default spawn command
-              spawnCmd = 'grunt',
+            var spawnCmd = 'grunt';
             // task name we want to run
-              taskName = cmd[0];
+            var taskName = cmd[0];
 
             // if Windows  need to change a few things
             if (process.platform === 'win32') {
@@ -131,7 +137,7 @@ module.exports = function (grunt) {
                 devtoolsVersion: version
               }));
             }
-            else if (allTasks.indexOf(taskName) > -1) {
+            else if (grunt.util._.where(allTasks, { 'name': taskName })) {
               var watcher = spawn(spawnCmd, cmd);
               watcher.key = key;
               workers.push(watcher);
@@ -142,6 +148,7 @@ module.exports = function (grunt) {
               }));
               // TODO: fix bug here with running task return
               connection.send('Running Task: ' + taskName);
+              grunt.log.ok('Running Task: ' + taskName);
               watcher.stdout.on('data', function (data) {
                 if (data) {
                   connection.send(watcher.pid + '|' + data.toString());
@@ -171,39 +178,31 @@ module.exports = function (grunt) {
 
       // when this session ends stop all workers
       connection.on('close', function () {
-        killWorkers();
+        killWorkers({type: 'connection'});
       });
     });
 
     /**
      * Clean up child processes
      */
-    var killWorkers = function (key) {
+    var killWorkers = function (opts) {
+      var opts = opts ? opts : {};
+
       workers.forEach(function (worker) {
-        if (key) {
-          if (worker.key === key || worker.pid === key) {
-              // TODO: update
-              if (process.platform === 'win32') {
-                  exec('taskkill /pid ' + worker.pid + ' /T /F');
-              } else {
-                  worker.kill();
-              }
-          }
+        if (process.platform === 'win32') {
+          exec('taskkill /pid ' + worker.pid + ' /T /F');
         } else {
-            // TODO: update
-            if (process.platform === 'win32') {
-                exec('taskkill /pid ' + worker.pid + ' /T /F');
-            } else {
-                process.kill(worker.pid);
-            }
+          try {
+            process.kill(worker.pid);
+          } catch (e) {
+            //console.log(e);
+          }
         }
       });
 
-      if (key) {
-        workers = grunt.util._.reject(workers, function(w) { return w.key === key || w.pid === key });
-      }
-
-      if (!key) {
+      // if we are killing workers not from the connection close
+      // TODO: this might break things
+      if (opts.type !== 'connection') {
         process.exit();
       }
     };
@@ -212,34 +211,5 @@ module.exports = function (grunt) {
     process.on("SIGINT", killWorkers);
     process.on("SIGTERM", killWorkers);
 
-    // TODO: move this later please
-    /**
-     * Get sidebar list for section from Home.md
-     */
-    function getAliasTasks() {
-      var l,
-        aliasTasks = [];
-
-      var gruntFile = 'Gruntfile.js',
-        gruntFileCoffee = 'Gruntfile.coffee';
-      // check if Gruntfile.coffee
-      if (grunt.file.exists(gruntFileCoffee)) {
-        gruntFile = gruntFileCoffee;
-      }
-      // make sure Gruntfile exists, otherwise exit
-      if (grunt.file.exists(gruntFile)) {
-        // TODO: add grunt read file here?
-        var lines = fs.readFileSync(gruntFile).toString().split('\n');
-        for (l in lines) {
-          var line = lines[l].replace(/ /g, '');
-          if (line.indexOf('grunt.registerTask') === 0) {
-            aliasTasks.push(line.split(/'/)[1]);
-          }
-        }
-      } else {
-        grunt.fail.warn('Cannot find Gruntfile.js or Gruntfile.coffee');
-      }
-      return aliasTasks;
-    }
   });
 };
