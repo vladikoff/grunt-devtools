@@ -1,7 +1,8 @@
 grunt-devtools
 ==============
+![](http://v14d.com/u/grunt-devtools-main.png)
 
-Grunt Task Runner Extension for Chrome Developer Tools and Adobe Brackets
+__Grunt Task Runner Extension for Chrome Developer Tools and Adobe Brackets__
 
 
 ## Quick Setup (Google Chrome)

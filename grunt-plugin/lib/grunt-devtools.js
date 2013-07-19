@@ -19,11 +19,14 @@ exports.init = function () {
       if (typeof block === 'string' && block.indexOf('Running') === 0) {
         idx = i;
       }
+      if (typeof block === 'string' && block.indexOf('Fatal error') === 0) {
+        console.log(block);
+      }
     });
 
     // if no index stop
     if (idx == null) {
-      console.log('Failed to find Grunt');
+      console.log('Failed to find your Gruntfile. \nAre you running \'grunt-devtools\' in a directory with a Gruntfile?');
       return;
     }
 
@@ -105,7 +108,15 @@ exports.init = function () {
     ]);
 
     devtools.stdout.on('data', function (data) {
-      console.log(data.toString());
+      if (data) {
+       console.log(data.toString());
+      }
+    });
+
+    devtools.stderr.on('data', function (data) {
+      if (data) {
+        console.log(data.toString());
+      }
     });
 
     function killWorkers() {

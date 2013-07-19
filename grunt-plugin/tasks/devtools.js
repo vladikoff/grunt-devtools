@@ -106,11 +106,16 @@ module.exports = function (grunt) {
             // task name we want to run
             var taskName = cmd[0];
 
+            if (process.env && process.env.PWD) {
+              // TODO: this might break win32
+              process.chdir(process.env.PWD);
+            }
+
             // if Windows  need to change a few things
             if (process.platform === 'win32') {
               // add cmd to spawn properly
               spawnCmd = 'grunt.cmd';
-              // Windows is not getting colours, due to the bug below
+              // Windows is not getting colours, due to the platform bug below
               cmd.push('-no-color');
               // TODO BUG: On Windows we need to run through a temp file
               // https://github.com/joyent/node/issues/3584
