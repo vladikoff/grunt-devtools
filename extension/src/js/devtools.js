@@ -295,8 +295,8 @@ function updateProjectList() {
 
 function updateTaskList() {
   // set the tasks templates
-  $regularTasks.html(taskListTpl({buttons: currentProject.taskListGeneric}));
   $aliasTasks.html(taskListTpl({buttons: currentProject.taskListAlias}));
+  $regularTasks.html(taskListTpl({buttons: currentProject.taskListGeneric}));
 
   // if running a task at this moment
   // we need this condition because we might come back to this project

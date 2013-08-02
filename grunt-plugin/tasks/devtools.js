@@ -30,6 +30,7 @@ module.exports = function (grunt) {
     // get alias tasks from the Gruntfile
     // TODO: update this
     var allTasks = [];
+
     if (grunt.option('core') && grunt.option('alias')) {
       allTasks.core = JSON.parse(grunt.option('core'));
       allTasks.alias = JSON.parse(grunt.option('alias'));
@@ -37,8 +38,8 @@ module.exports = function (grunt) {
       allTasks = require('../lib/local').init(grunt).getTasks();
     }
 
-    var aliasTasks = allTasks.core;
-    var basicTasks = allTasks.alias;
+    var aliasTasks = allTasks.alias;
+    var basicTasks = allTasks.core;
     var allTasks = allTasks.core.concat(allTasks.alias);
 
     var server = http.createServer(function (request, response) {
@@ -134,15 +135,31 @@ module.exports = function (grunt) {
             }
 
             if (taskName === 'handleSocketOpen') {
+              // build a list of core tasks with targets
+              var basicWithTargets = [];
+              // for every core tasks
+              basicTasks.forEach(function(task) {
+                // push the core task into the list
+                basicWithTargets.push(task);
+                // if this task has targets
+                if (task.targets) {
+                  task.targets.forEach(function (target) {
+                    // create a new mini task that has a name of the core task plus target name
+                    basicWithTargets.push({ name: task.name + ':' + target });
+                  });
+                }
+              });
+
+              // send a list of tasks and the project info to the connection
               connection.sendUTF(JSON.stringify({
-                tasks: basicTasks,
+                tasks: basicWithTargets,
                 alias: aliasTasks,
                 project: projectName,
                 port: projectPort,
                 devtoolsVersion: version
               }));
             }
-            else if (grunt.util._.where(allTasks, { 'name': taskName })) {
+            else if (grunt.util._.where(allTasks, { 'name': taskName.split(':')[0] })) {
               var watcher = spawn(spawnCmd, cmd);
               watcher.key = key;
               workers.push(watcher);

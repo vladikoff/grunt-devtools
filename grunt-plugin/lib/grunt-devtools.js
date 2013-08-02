@@ -68,8 +68,6 @@ exports.init = function () {
         }
         // else regular task
         else {
-          // if its a multitask we want to collect the targets
-          if (task.multi) {
             task.targets = [];
 
             for (var prop in configRaw[name]) {
@@ -82,8 +80,6 @@ exports.init = function () {
                   task.targets.push(prop);
                 }
               }
-            }
-
           }
           // add to Core task list
           coreTasks.push(task);

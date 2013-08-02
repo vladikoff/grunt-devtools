@@ -9,7 +9,7 @@ __Grunt Task Runner Extension for Chrome Developer Tools and Adobe Brackets__
 
 * Download the [Grunt Devtools extension for Chrome Developer Tools](https://chrome.google.com/webstore/detail/grunt-devtools/fbiodiodggnlakggeeckkjccjhhjndnb?hl=en)
  from the Chrome Web Store.
-* Global Install (Want a local install? See [local install](#local-install)).
+* Global Install (Want a local plugin install? See [local setup](#local-setup)).
   * __`npm install -g grunt-devtools`__
   * run __`grunt-devtools`__ in a directory with a Gruntfile!
 * open Chrome Dev tools, find the __Grunt tab__. Your grunt tasks should now be accessible from Chrome.
