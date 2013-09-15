@@ -1,5 +1,2 @@
 #!/usr/bin/env node
-
-'use strict';
-
-require('../lib/grunt-devtools').init();
+require('../lib/grunt-devtools')();

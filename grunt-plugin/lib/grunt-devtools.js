@@ -1,18 +1,22 @@
-exports.init = function () {
+module.exports = function () {
 
+  var exec = require('child_process').exec;
   var spawn = require('child_process').spawn;
+  // path to the custom devtools task
   var devtoolsTask = __dirname + '/../tasks';
-  var grunt = spawn('grunt', ['-no-color', '-tasks', devtoolsTask, '_devtools_config']);
-  var d = "";
 
-  grunt.stdout.on('data', function (data) {
-    d += data;
-  });
+  // command to load the custom devtools task and run the _devtools_config task
+  var cmd = 'grunt -no-color -tasks ' + devtoolsTask + ' _devtools_config';
 
-  grunt.on('close', function (code, signal) {
+  // run the command to get the task list
+  exec(cmd, function (err, stdout, stderr) {
+
+    if (stderr && stderr.length > 0) {
+      console.log(stderr.toString());
+    }
+
     var idx = null;
-    var response = d.toString().split('\n');
-    //console.log(response);
+    var response = stdout.toString().split('\n');
 
     // find the index offset of config objects
     response.forEach(function (block, i) {
@@ -24,16 +28,16 @@ exports.init = function () {
       }
     });
 
-    // if no index stop
+    // if no index, then stop
     if (idx == null) {
       console.log('Failed to find your Gruntfile. \nAre you running \'grunt-devtools\' in a directory with a Gruntfile?');
       return;
     }
 
     // gets Grunt raw config
-    var gruntRaw = d.toString().split('\n')[idx + 1];
+    var gruntRaw = response[idx + 1];
     // gets Grunt task config
-    var gruntTasks = d.toString().split('\n')[idx + 2];
+    var gruntTasks = response[idx + 2];
 
     var configRaw = null;
     var configTasks = null;
@@ -68,18 +72,18 @@ exports.init = function () {
         }
         // else regular task
         else {
-            task.targets = [];
+          task.targets = [];
 
-            for (var prop in configRaw[name]) {
-              // exclude options target
-              if (prop !== 'options') {
-                var target = configRaw[name][prop];
+          for (var prop in configRaw[name]) {
+            // exclude options target
+            if (prop !== 'options') {
+              var target = configRaw[name][prop];
 
-                // collect object properties
-                if (typeof target === 'object' && !(target instanceof Array)) {
-                  task.targets.push(prop);
-                }
+              // collect object properties
+              if (typeof target === 'object' && !(target instanceof Array)) {
+                task.targets.push(prop);
               }
+            }
           }
           // add to Core task list
           coreTasks.push(task);
@@ -104,20 +108,20 @@ exports.init = function () {
     ]);
 
     devtools.stdout.on('data', function (data) {
-      if (data) {
-       console.log(data.toString());
+      if (data && data.length > 0) {
+        console.log(data.toString());
       }
     });
 
     devtools.stderr.on('data', function (data) {
-      if (data) {
+      if (data && data.length > 0) {
         console.log(data.toString());
       }
     });
 
     function killWorkers() {
-        process.kill(devtools.pid);
-        process.exit();
+      process.kill(devtools.pid);
+      process.exit();
     }
 
     process.on("uncaughtException", killWorkers);
