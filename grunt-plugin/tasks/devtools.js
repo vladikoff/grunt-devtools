@@ -116,14 +116,6 @@ module.exports = function (grunt) {
             if (process.platform === 'win32') {
               // add cmd to spawn properly
               spawnCmd = 'grunt.cmd';
-              // Windows is not getting colours, due to the platform bug below
-              cmd.push('-no-color');
-              // TODO BUG: On Windows we need to run through a temp file
-              // https://github.com/joyent/node/issues/3584
-              var pipeFile = 'node_modules\\grunt-devtools-' + workers.length + '.tmp',
-                pipeTmp = '> ' + pipeFile + ' & type ' + pipeFile + ' & del ' + pipeFile;
-              // add tmp pipe to the command
-              cmd = cmd.concat(pipeTmp.split(' '));
             }
 
             // if running in Adobe Brackets env
