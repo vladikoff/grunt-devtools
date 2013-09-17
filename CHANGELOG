@@ -1,0 +1,20 @@
+v0.2.0
+    - adding global support via `npm install -g grunt-devtools`
+    - adding target support in the UI
+    - added color log support
+    - style and formatting fixes
+    - other bug fixes
+    - adding experimental Brackets support
+v0.1.0.7
+    - Fixes, added update warnings.
+v0.1.0.6
+    - Various fixes.
+v0.1.0.5
+    - Updating UI
+    - Adding a way to set flags `--force` and `--verbose`
+    - output fixes
+    - background task updates.
+v0.1.0.4
+    - Adding Background Task support. You can now press `(B)` to send the task into background and continue running other tasks.
+v0.1.0-alpha3
+    - Adds `Gruntfile.coffee` support

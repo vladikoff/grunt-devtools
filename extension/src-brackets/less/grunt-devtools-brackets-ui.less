@@ -1,0 +1,62 @@
+/*
+
+Styles for the external Brackets UI.
+Used for the extension icon and extension integration.
+
+*/
+
+#grunt-preview-icon {
+    background: url(../img/grunt-logo.svg);
+    background-repeat: no-repeat;
+    background-position: left top;
+    background-size: 100%;
+    display: inline-block;
+    position: relative;
+    width: 18px;
+    height: 16px;
+    padding-right: 8px;
+    opacity: .5;
+}
+
+#grunt-preview-icon.active {
+    background: url(../img/grunt-logo.svg);
+    background-size: 100%;
+}
+
+#grunt-preview-icon:hover {
+  opacity: .75;
+}
+
+.grunt-devtools-file {
+  position: relative;
+}
+
+.grunt-devtools-run {
+  position: absolute;
+  left: -8px;
+  top: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 15px;
+  background: #E48731;
+}
+.grunt-devtools-run.running {
+  opacity: 0.3;
+}
+
+#panel-grunt-devtools {
+  position: relative;
+}
+
+#panel-grunt-devtools-panel-control {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-family: monospace;
+  font-size: 25px;
+  color: grey;
+  background: none;
+  width: 30px;
+  padding-top: 5px;
+  height: 25px;
+}

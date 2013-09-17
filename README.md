@@ -1,12 +1,26 @@
-grunt-devtools (preview)
+grunt-devtools
 ==============
+![](http://v14d.com/u/grunt-devtools-main.png)
 
-Grunt Task Runner Extension for Chrome Developer Tools
+__Grunt Task Runner Extension for Chrome Developer Tools and Adobe Brackets__
 
-## Quick Setup
 
-* Download the [Grunt Devtools](https://chrome.google.com/webstore/detail/grunt-devtools/fbiodiodggnlakggeeckkjccjhhjndnb?hl=en)
-add-on for Chrome Dev Tools from the Chrome Web Store.
+## Quick Setup (Google Chrome)
+
+* Download the [Grunt Devtools extension for Chrome Developer Tools](https://chrome.google.com/webstore/detail/grunt-devtools/fbiodiodggnlakggeeckkjccjhhjndnb?hl=en)
+ from the Chrome Web Store.
+* Global Install (Want a local plugin install? See [local setup](#local-setup)).
+  * __`npm install -g grunt-devtools`__
+  * run __`grunt-devtools`__ in a directory with a Gruntfile!
+* open Chrome Dev tools, find the __Grunt tab__. Your grunt tasks should now be accessible from Chrome.
+
+
+## Screenshots
+
+![](http://v14d.com/i/513393cbb7e8b.jpg)
+![](http://v14d.com/i/5133941ceb6b4.jpg)
+
+## Local Setup
 
 * `npm install grunt-devtools` in your grunt project
 * Add `grunt.loadNpmTasks('grunt-devtools');` to your `Gruntfile`
@@ -17,52 +31,15 @@ add-on for Chrome Dev Tools from the Chrome Web Store.
 ## Updating from an older version
 
 * Chrome extension updates automatically or you can force an update under `chrome://extensions` ![](http://v14d.com/i/513cbb8a20af4.png)
-* Grunt plugin updates using `npm install grunt-devtools` ( auto-update might be coming soon )
-* The versions of the plugin and extension should always match ( `0.1.0.1` in Chrome is `0.1.0-1` on npm )
-![](http://v14d.com/i/5134559bdb23a.jpg)
+* Grunt plugin updates using `npm install grunt-devtools@latest`
+* The versions of the plugin and extension should always match ( `0.2.0` in Chrome is `0.2.0` on npm )
 
-## Preview Screenshots
-
-![](http://v14d.com/i/513394803d3d9.jpg)
-![](http://v14d.com/i/513393cbb7e8b.jpg)
-![](http://v14d.com/i/5133941ceb6b4.jpg)
-
-## Dev Setup
-
-### Chrome Extension
-
-Load unpacked extension from the `extension` folder.
-
-### Grunt Plugin Installation
-
-* Locally install the plugin using `npm install [folder]/grunt-plugin`
-* Add `grunt.loadNpmTasks('grunt-devtools');` to your `Gruntfile`
-* run `grunt devtools`
 
 ## Issues
 
 If you experience issues, perform an [update first](https://github.com/vladikoff/grunt-devtools#updating-from-an-older-version).
-Check the [project wiki](https://github.com/vladikoff/grunt-devtools/wiki).
-If issues still occur - [report it](https://github.com/vladikoff/grunt-devtools/issues) or ask for help in the  `#grunt` irc channel on `freenode`
+If issues still occur - [report it](https://github.com/vladikoff/grunt-devtools/issues) or ask for help in the  `#grunt` irc channel on Freenode
 
-## Current Limitations
+See the [CHANGELOG](CHANGELOG) for release history .
+See the [contributing guide](contributing.md) for local development instructions.
 
-* The extension will work for up to 5 instances of `grunt devtools` at a time
-(this means if you like to work on more than 5 projects at a time, you will need to turn off the task)
-
-* Background tasks disappear when done
-
-## TODO
-
-* Test Windows
-* registerMultiTask support
-* send tasks into background right away
-
-## Release History
-
-* 0.1.0.7 - Fixes, added update warnings.
-* 0.1.0.6 - Various fixes.
-* 0.1.0.5 - Updating UI, Adding a way to set flags `--force` and `--verbose`, output fixes, background task updates.
-* 0.1.0.4 - Adding Background Task support. You can now press `(B)` to send
-the task into background and continue running other tasks.
-* 0.1.0-alpha3 - Adds `Gruntfile.coffee` support

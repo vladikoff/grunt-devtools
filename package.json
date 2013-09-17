@@ -1,0 +1,34 @@
+{
+  "name": "grunt-devtools-project",
+  "version": "0.2.0",
+  "private": true,
+  "homepage": "https://github.com/vladikoff/grunt-devtools",
+  "author": {
+    "name": "vladikoff",
+    "email": "vlad.filippov@gmail.com",
+    "url": "http://vf.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vladikoff/grunt-devtools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vladikoff/grunt-devtools/issues"
+  },
+  "main": "Gruntfile.js",
+  "engines": {
+    "node": "~0.8.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-watch": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.0",
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "grunt-contrib-less": "~0.5.0",
+    "grunt-contrib-jst": "~0.5.0",
+    "grunt-devtools": "~0.1.0-7",
+    "grunt-contrib-concat": "~0.1.3"
+  }
+}

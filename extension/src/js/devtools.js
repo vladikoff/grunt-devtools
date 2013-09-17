@@ -1,28 +1,34 @@
 'use strict';
 
-// Chrome extension
-var manifest = chrome.runtime.getManifest(),
-  extVersion = manifest.version;
+const MAX_CONNECTIONS = 5;
+const CONNECTION_PORT = 61749;
+
+// Extension version, comes from runtime
+var extVersion = manifest.version;
 
 // Grunt project setting
-var socket,
-  projects = [],
+var projects = [],
   currentProject;
 
 // Port settings
-var startPort = 61749,
+var startPort = CONNECTION_PORT,
   currentPort = startPort,
-  maxPort = currentPort + 5;
+  maxPort = currentPort + MAX_CONNECTIONS;
 
 // Templates
-var projectListTpl = _.template($("#projectList").html()),
-  taskListTpl = _.template($("#taskList").html()),
-  bgTasksTpl = _.template($("#bgTaskList").html());
+var projectListTpl = JST['extension/src/templates/project-list.html'],
+  taskListTpl = JST['extension/src/templates/task-list.html'],
+  bgTasksTpl = JST['extension/src/templates/background-task-list.html'],
+  panelTpl = JST['extension/src/templates/panel-tpl.html'];
+
+// Setup main view
+var $body = $('body'),
+  $panel = $('#panel');
+$panel.html(panelTpl({}));
 
 // UI Selectors
 var $output = $("#placeOutput"),
   $outputWrap = $('#output'),
-  $body = $('body'),
   $tasks = $('#tasks'),
   $bgSection = $('#backgroundTasks'),
   $bgTasks = $('#placeBackgroundTasks'),
@@ -30,6 +36,92 @@ var $output = $("#placeOutput"),
   $aliasTasks = $('#placeAliasTasks'),
   $projects = $('#placeProjects'),
   $warning = $('#updateWarning');
+
+/**
+ * Console color styles
+ * TODO: move this later
+ */
+var modStyles = {
+// "name": [beginCode, endCode, htmlTag]
+  'bold': [1, 22, "b"],
+  'italic': [2, 23, "i"],
+  'underline': [4, 24, "u"],
+  'inverse': [7, 27, "span"],
+  'strikethrough': [9, 29, "del"]
+};
+
+var colorStyles = {
+// "name": beginCode (endCode is always "39" and htmlTag is "span")
+  'white': 37,
+  'grey': 90,
+  'black': 30,
+  'blue': 34,
+  'cyan': 36,
+  'green': 32,
+  'magenta': 35,
+  'red': 31,
+  'yellow': 33
+};
+
+var regExps = null;
+
+function beginTag(tag, cls) {
+  return '<' + tag + ' class="' + cls + '">';
+}
+
+function endTag(tag) {
+  return '</' + tag + '>';
+}
+
+function themeClass(name) {
+  return 'theme-' + name;
+}
+
+function cliRegExp(num) {
+  return new RegExp('\x1B\\[' + num + 'm', "g");
+}
+
+/**
+ * Create regular expression from styles definition
+ */
+function getRegExps(modStyles, colorStyles) {
+  if (!_.isNull(regExps)) return regExps;
+
+  var i = 1, name;
+  regExps = [
+    [cliRegExp(39), endTag("span")]
+  ];
+  for (name in modStyles) {
+    regExps[i++] = [
+      cliRegExp(modStyles[name][0]),
+      beginTag(modStyles[name][2], themeClass(name))
+    ];
+    regExps[i++] = [
+      cliRegExp(modStyles[name][1]),
+      endTag(modStyles[name][2])
+    ];
+  }
+  for (name in colorStyles) {
+    regExps[i++] = [
+      cliRegExp(colorStyles[name]),
+      beginTag("span", themeClass(name))
+    ];
+  }
+
+  return regExps;
+}
+
+/**
+ + * Colorize a message.
+ + */
+function colorize(msg) {
+  var regExps = getRegExps(modStyles, colorStyles);
+  var result = msg;
+  for (var r in regExps) {
+    result = result.replace(regExps[r][0], regExps[r][1]);
+  }
+  return result;
+}
 
 /**
  * Connect to a devtools socket
@@ -44,7 +136,7 @@ function connect() {
   if (!exists) {
     var socketAddr = 'ws://localhost:' + currentPort;
 
-    socket = new WebSocket(socketAddr, 'echo-protocol');
+    var socket = new WebSocket(socketAddr, 'echo-protocol');
     socket.onopen = handleSocketOpen;
     socket.onmessage = handleSocketMessage;
     socket.onclose = handleSocketClose;
@@ -63,25 +155,34 @@ function connect() {
  */
 function handleSocketOpen(e) {
   $body.removeClass('offline').addClass('online');
-  socket.send('handleSocketOpen');
+  this.send('handleSocketOpen');
 }
 
 /**
  * Handle socket message for an event
  */
 function handleSocketMessage(event) {
-  var data = event.data;
+  var data = event.data,
+    action = false;
 
-  // TODO: please fix this later, this will handle most actions via JSON
+  // try to parse the message as JSON from the socket
   try {
     data = JSON.parse(event.data);
-    if (data && data.project) {
+    // set that this a JSON action
+    action = true;
+  } catch (e) {
+  }
+
+  // if we got a specific action
+  if (action && data) {
+    if (data.project) {
       // connecting a new project
       // add this new project
       projects.push({
         name: data.project,
         port: parseInt(data.port),
-        socket: socket,
+        // this socket from handleSocketMessage
+        socket: this,
         taskListAlias: data.alias,
         taskListGeneric: data.tasks,
         tasks: [],
@@ -91,11 +192,12 @@ function handleSocketMessage(event) {
 
       // add new project button
       updateProjectList();
+
       // set to current to latest, if not running
       setProject(projects.length - 1);
     }
     // process done
-    else if (data && data.action === 'done') {
+    else if (data.action === 'done') {
       currentProject.tasks = _.reject(currentProject.tasks, function (task) {
         return task.pid === data.pid;
       });
@@ -104,22 +206,27 @@ function handleSocketMessage(event) {
       enableActivity();
     }
     // process started
-    else if (data && data.action === 'start') {
+    else if (data.action === 'start') {
       currentProject.currentTask = {name: data.name, pid: data.pid, output: []};
       currentProject.tasks.push(currentProject.currentTask);
       updateTaskList();
     }
-  } catch (e) {
-    // new task
-    if (data.indexOf('Running Task:') === 0) {
+  }
+  // just regular stdout from a task
+  else {
+    // TODO: this can be done with an action
+    if (data && data.indexOf('Running Task:') === 0) {
       $output.html('');
     } else if (data.length > 1) {
       if (currentProject.tasks.length > 0) {
         var msg = data.split("|"),
           pid = msg[0],
           timestamp = new Date().toString().split(' ')[4],
-          output = '<pre>' + timestamp + ' - ' + _.escape(msg[1]) + '</pre>';
+          output = '';
 
+        if (msg[1].length > 1) {
+          output = '<pre><span class="theme-timestamp">' + timestamp + '</span> - ' + colorize(_.escape(msg[1])) + '</pre>';
+        }
         // find a task with a process id of the message
         var pidTask = _.find(currentProject.tasks, function (task) {
           return task.pid === parseInt(pid);
@@ -135,6 +242,7 @@ function handleSocketMessage(event) {
           $output.append(output);
           $outputWrap.scrollTop($output.height());
         }
+
       }
     }
   }
@@ -186,30 +294,47 @@ function updateProjectList() {
 }
 
 function updateTaskList() {
-  // set the tasks
-  $regularTasks.html(taskListTpl({buttons: currentProject.taskListGeneric}));
+  // set the tasks templates
   $aliasTasks.html(taskListTpl({buttons: currentProject.taskListAlias}));
+  $regularTasks.html(taskListTpl({buttons: currentProject.taskListGeneric}));
 
+  // if running a task at this moment
+  // we need this condition because we might come back to this project
+  // and we need to show that the task is running
   if (currentProject.currentTask) {
+    // find the task in the list with the current task name
     $('.task[value="' + currentProject.currentTask.name + '"]')
+      // set the task kill button pid
       .siblings('.b-kill').data('pid', currentProject.currentTask.pid).end()
+      // set that this is an active task
       .parent().addClass('active-task');
   }
 
+  // check the list of background tasks
   var bgTasks = currentProject.tasks;
+  // if running a task
   if (currentProject.currentTask) {
+    // exclude the task that is running right now from all task
+    // so we get a true background taks list
     bgTasks = _.reject(currentProject.tasks, function (task) {
       return task.pid === currentProject.currentTask.pid;
     });
   }
 
+  // if there are background tasks
   if (bgTasks.length > 0) {
+    // show the background task header
     $bgSection.addClass('show');
+    // populate the background task list
     $bgTasks.html(bgTasksTpl({tasks: bgTasks}));
-  } else {
+  }
+  // else no tasks in the background
+  else {
+    // hides the background task header
     $bgSection.removeClass('show');
   }
 
+  // if the project is running, we need to set the running stage
   if (currentProject.running) {
     $('#tasks .task, #projects .task').prop('disabled', true);
   }
@@ -217,17 +342,16 @@ function updateTaskList() {
 
 function setProject(idx) {
   // if not running, change the active project. Otherwise it stays the same
-
   // TODO: bug here, need to check if the task is running
   // get project by index
   currentProject = projects[idx];
   // update project tab style
   var buttons = $projects.find('button');
+
   buttons.removeClass('active');
   $(buttons.get(idx)).addClass('active');
-  console.log(currentProject.devtoolsVersion);
   // check version
-  if (currentProject.devtoolsVersion == null || currentProject.devtoolsVersion.replace(/-/g, '.') !== extVersion) {
+  if (currentProject && (currentProject.devtoolsVersion == null || currentProject.devtoolsVersion.replace(/-/g, '.') !== extVersion)) {
     $warning.addClass('show');
   } else {
     $warning.removeClass('show');
@@ -254,6 +378,7 @@ connect();
 /**
  * Button Events
  */
+
 
 // execute task
 $tasks.on('click', '.task', function () {
@@ -314,13 +439,18 @@ $tasks.on('click', '.b-kill', function () {
 
   // if there's a pid, use it instead
   if (btn.data('pid')) {
-    taskInfo = {name: btn.val(), pid: btn.data('pid')};
-    // TODO: validate this?
+    taskInfo = {name: btn.siblings('.task').val(), pid: btn.data('pid')};
+    // update the tasks list for the current project, leaving only those that
+    // do not match the pid of the button
     currentProject.tasks = _.reject(currentProject.tasks, function (task) {
       return task.pid === btn.data('pid');
     });
+
+    // TODO: validate this? validate that the process was killed ?
+    // TODO BUG: fix flow of killing tasks.
     updateTaskList();
   }
+
   currentProject.socket.send(JSON.stringify({
     action: 'killTask',
     task: taskInfo

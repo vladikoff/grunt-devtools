@@ -1,0 +1,340 @@
+* {
+  -webkit-box-sizing: border-box;
+}
+
+html, body, #panel {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  position: fixed;
+  font-family: Lucida Grande, sans-serif;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+h2, label {
+  text-transform: uppercase;
+  position: relative;
+  height: 18px;
+  font-size: 11px;
+  padding: 10px;
+  white-space: nowrap;
+  margin-top: 1px;
+  color: rgb(92, 110, 129);
+  font-weight: bold;
+  text-shadow: rgba(255, 255, 255, 0.75) 0 1px 0;
+}
+
+#backgroundTasks, #killTask {
+  display: none;
+}
+#backgroundTasks.show, #updateWarning.show {
+  display: block;
+}
+
+#backgroundTasks h2 {
+  color: green;
+}
+
+#projects {
+  background: -webkit-gradient(linear, left top, left bottom, from(rgb(236, 236, 236)), to(rgb(217, 217, 217)));
+  border-bottom: 1px solid rgb(163, 163, 163);
+}
+
+#tools {
+  height: 100%;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: row nowrap;
+  -webkit-flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+  -webkit-justify-content: center;
+  -webkit-align-content: center;
+  -webkit-align-items: stretch;
+}
+
+#tasks {
+  height: 100%;
+  width: 25%;
+  min-width: 150px;
+  background-color: rgb(214, 221, 229);
+  border-right: 1px solid rgb(64%, 64%, 64%);
+  -webkit-flex: 1 1 auto;
+  button {
+    display: block;
+    font-weight: bold;
+    padding: 5px;
+    padding-left: 20px;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    text-align: left;
+    &:hover {
+      background: rgba(56, 121, 217, 0.1);
+      color: rgb(92, 110, 129);
+    }
+  }
+  li {
+    position: relative;
+    .b {
+      text-align: center;
+      display: none;
+      position: absolute;
+      background: rgba(92, 110, 129, 0.1);
+      right: 15px;
+      padding: 2px 4px;
+      top: 3px;
+      font-size: 10px;
+      width: auto;
+      border-radius: 15px;
+      border: 1px solid rgba(92, 110, 129, 0.1);
+      height: auto;
+      font-family: Arial, monospace;
+      color: white;
+
+      &:hover {
+        color: white;
+      }
+
+      &.b-kill {
+        opacity: 0.7;
+        background: rgba(92, 110, 129, 0.9);
+      }
+      &.b-second {
+        right: 40px;
+      }
+      &.b.b-bg {
+        background: green;
+      }
+      &.b-flag {
+        opacity: 0.2;
+        display: none;
+        &:hover {
+          opacity: 0.6;
+        }
+        &.b-on {
+          opacity: 1;
+          display: block;
+        }
+      }
+      &.b-verbose:hover {
+        background: orange;
+      }
+      &.b-force:hover {
+        background: #ff3d00;
+      }
+      &.b-verbose.b-on {
+        background: orange;
+      }
+      &.b-force.b-on {
+        background: #ff3d00;
+      }
+    }
+    &:hover .b.b-flag  {
+      display: block;
+    }
+  }
+}
+
+.running #tasks li:hover .b.b-flag {
+  display: none;
+}
+
+pre {
+  font-size: 11px;
+  margin: 1px 0 1px 0;
+  color: rgb(92, 110, 129);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+#projects {
+  min-height: 25px;
+  h2 {
+    display: inline;
+  }
+  button {
+    border: 1px solid rgba(163, 163, 163, 0);
+    &.active {
+      background: rgba(255,255,255, 0.5);
+      border: 1px solid rgb(163, 163, 163);
+      color: rgb(46, 46, 46);
+    }
+    &:hover {
+      background: rgba(255,255,255, 0.1);
+      border: 1px solid rgb(163, 163, 163);
+      color: rgb(46, 46, 46);
+    }
+  }
+}
+
+#placeOutput {
+  padding: 0 0 40px 10px;
+}
+
+#placeProjects {
+  display: inline;
+}
+
+#tasks li .b.b-kill:hover {
+  background-color: red;
+  border-color: red;
+  opacity: 1;
+}
+
+#notice p {
+  color: rgb(92, 110, 129);
+  font-size: 25px;
+  padding: 20px;
+  text-align: center;
+}
+
+#output, #tasks {
+  overflow: auto;
+}
+
+#output {
+  width: 75%;
+  -webkit-flex: 3 1 auto;
+}
+
+.offline {
+  #panel {
+    display: none;
+  }
+}
+
+#notice small {
+  color: rgba(92, 110, 129, 0.5);
+}
+
+.offline #notice {
+  display: block;
+}
+
+.online #notice{
+  display: none;
+}
+
+#running {
+  display: none;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
+.running {
+  #tasks .task:hover {
+    cursor: not-allowed;
+  }
+
+  #tasks .active-task .b {
+    display: block;
+  }
+
+  #tasks .task {
+    opacity: 0.3;
+  }
+
+  #tasks .active-task{
+    opacity: 1;
+  }
+
+  #running {
+    display: block;
+  }
+}
+
+#backgroundTasks li .b {
+  display: block;
+}
+
+#updateWarning {
+  display: none;
+  position: relative;
+  border: 1px solid rgb(64%, 64%, 64%);
+  border-top: none;
+  border-right: none;
+  background: -webkit-linear-gradient(top, #FFF8BA 0%, #F1DA36 100%);
+  font-size: 10px;
+  p {
+    padding: 5px;
+    margin: 0;
+  }
+}
+
+@media all and (max-width: 250px) {
+  #output {
+    display: none;
+  }
+  #tasks {
+    width: 100%;
+  }
+}
+
+
+/**
+ * Default theme.
+ * TODO: theme support in options;
+ */
+.theme-timestamp {
+  color: silver;
+}
+
+.theme-inverse {
+  background-color: black;
+  color: white;
+}
+
+.theme-white {
+  color: white;
+}
+
+.theme-grey {
+  color: grey;
+}
+
+.theme-black {
+  color: grey;
+}
+
+.theme-blue {
+  color: blue;
+}
+
+.theme-cyan {
+  color: #00c7ff;
+}
+
+.theme-green {
+  color: green;
+}
+
+.theme-magenta {
+  color: magenta;
+}
+
+.theme-red {
+  color: red;
+}
+
+.theme-yellow {
+  color: #ffb600;
+}
