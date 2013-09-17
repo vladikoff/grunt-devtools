@@ -1,13 +1,12 @@
 module.exports = function () {
 
-  var exec = require('child_process').exec;
   var shell = require('shelljs');
   var spawn = require('child_process').spawn;
   // path to the custom devtools task
   var devtoolsTask = __dirname + '/../tasks';
-	if (process.platform === 'win32') {
-		devtoolsTask = __dirname + '\\..\\tasks';
-	}
+  if (process.platform === 'win32') {
+    devtoolsTask = __dirname + '\\..\\tasks';
+  }
 
   // command to load the custom devtools task and run the _devtools_config task
   var cmd = 'grunt -no-color -tasks ' + devtoolsTask + ' _devtools_config';
@@ -92,7 +91,10 @@ module.exports = function () {
   });
 
   var devCmd = [
-  	'grunt.cmd',
+    // add devtools plugin tasks to project's Grunt
+    '--tasks',
+    devtoolsTask,
+    'devtools',
     // no color output for this task
     '-no-color',
     // load core tasks from the array
@@ -100,27 +102,12 @@ module.exports = function () {
     JSON.stringify(coreTasks),
     // load alias tasks from the array
     '--alias',
-    JSON.stringify(aliasTasks),
-    // add devtools plugin tasks to project's Grunt
-    '--tasks',
-    devtoolsTask,
-    'devtools'
-  ].join(" ");
+    JSON.stringify(aliasTasks)
+  ];
 
-  //console.log(devCmd);
-  var devtools = shell.exec(devCmd, { async: true, silent: true });
-
-  devtools.stdout.on('data', function (data) {
-    if (data && data.length > 0) {
-      console.log(data.toString());
-    }
-  });
-
-  devtools.stderr.on('data', function (data) {
-    if (data && data.length > 0) {
-      console.log(data.toString());
-    }
-  });
+  var devtools = spawn('grunt', devCmd);
+  devtools.stdout.pipe(process.stdout);
+  devtools.stderr.pipe(process.stderr);
 
   function killWorkers() {
     process.kill(devtools.pid);
