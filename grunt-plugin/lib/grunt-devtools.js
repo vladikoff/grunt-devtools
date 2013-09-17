@@ -65,6 +65,9 @@ module.exports = function () {
 
       // if this task has info and starts with 'Alias for'
       if (task.info && task.info.indexOf('Alias for') === 0) {
+        delete task.meta;
+        delete task.info;
+
         // add to Alias task list
         aliasTasks.push(task);
       }
@@ -83,6 +86,13 @@ module.exports = function () {
             }
           }
         }
+
+        if (task.targets.length === 0) {
+          delete task.targets;
+        }
+
+        delete task.meta;
+        delete task.info;
         // add to Core task list
         coreTasks.push(task);
       }
