@@ -41,5 +41,5 @@ If you experience issues, perform an [update first](https://github.com/vladikoff
 If issues still occur - [report it](https://github.com/vladikoff/grunt-devtools/issues) or ask for help in the  `#grunt` irc channel on Freenode
 
 See the [CHANGELOG](CHANGELOG) for release history .
-See the [contributing guide](contributing.md) for local development instructions.
+See the [contributing guide](CONTRIBUTING.md) for local development instructions.
 
