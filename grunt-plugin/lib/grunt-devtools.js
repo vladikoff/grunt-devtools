@@ -28,7 +28,7 @@ module.exports = function () {
 
   // if no index, then stop
   if (idx == null) {
-    console.log('Failed to find your Gruntfile. \nAre you running \'grunt-devtools\' in a directory with a Gruntfile?');
+    console.log('Failed to find your Gruntfile or \'grunt\' node module. \nAre you running \'grunt-devtools\' in a directory with a Gruntfile?');
     return;
   }
 
@@ -90,7 +90,7 @@ module.exports = function () {
     }
   });
 
-  var devCmd = [
+  var spawnArgs = [
     // add devtools plugin tasks to project's Grunt
     '--tasks',
     devtoolsTask,
@@ -104,8 +104,9 @@ module.exports = function () {
     '--alias',
     JSON.stringify(aliasTasks)
   ];
+  var spawnCmd = (process.platform === 'win32') ? 'grunt.cmd' : 'grunt';
+  var devtools = spawn(spawnCmd, spawnArgs);
 
-  var devtools = spawn('grunt', devCmd);
   devtools.stdout.pipe(process.stdout);
   devtools.stderr.pipe(process.stderr);
 
