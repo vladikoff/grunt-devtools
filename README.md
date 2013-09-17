@@ -33,7 +33,6 @@ __Grunt Task Runner Extension for Chrome Developer Tools and Adobe Brackets__
 * Chrome extension updates automatically or you can force an update under `chrome://extensions` ![](http://v14d.com/i/513cbb8a20af4.png)
 * Grunt plugin updates using `npm install grunt-devtools@latest`
 * The versions of the plugin and extension should always match ( `0.2.0` in Chrome is `0.2.0` on npm )
-![](http://v14d.com/i/5134559bdb23a.jpg)
 
 
 ## Issues
