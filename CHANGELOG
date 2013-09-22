@@ -1,3 +1,5 @@
+v0.2.1
+    - Fixes Windows "command line too long" bug
 v0.2.0
     - adding global support via `npm install -g grunt-devtools`
     - adding target support in the UI
