@@ -9,7 +9,7 @@ module.exports = function () {
   }
 
   // command to load the custom devtools task and run the _devtools_config task
-  var cmd = 'grunt -no-color -tasks ' + devtoolsTask + ' _devtools_config';
+  var cmd = 'grunt -no-color -tasks "' + devtoolsTask + '" _devtools_config';
 
   // run the command to get the task list  
   var result = shell.exec(cmd, { silent: true });
