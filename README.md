@@ -12,7 +12,7 @@ __Grunt Task Runner Extension for Chrome Developer Tools and Adobe Brackets__
 * Global Install (Want a local plugin install? See [local setup](#local-setup)).
   * __`npm install -g grunt-devtools`__
   * run __`grunt-devtools`__ in a directory with a Gruntfile!
-* open Chrome Dev tools, find the __Grunt tab__. Your grunt tasks should now be accessible from Chrome.
+* Open Chrome Dev tools, find the __Grunt tab__. Your grunt tasks should now be accessible from Chrome.
 
 
 ## Screenshots
@@ -30,15 +30,15 @@ __Grunt Task Runner Extension for Chrome Developer Tools and Adobe Brackets__
 
 ## Updating from an older version
 
-* Chrome extension updates automatically or you can force an update under `chrome://extensions` ![](http://v14d.com/i/513cbb8a20af4.png)
+* Chrome extensions updates automatically, but you can force to update under `chrome://extensions` ![](http://v14d.com/i/513cbb8a20af4.png)
 * Grunt plugin updates using `npm install grunt-devtools@latest`
-* The versions of the plugin and extension should always match (`0.2.1` in Chrome is `0.2.1` on npm)
+* The version of the plugin and extension should always match (`0.2.1` in Chrome is `0.2.1` on npm)
 
 
 ## Issues
 
-If you experience issues, perform an [update first](https://github.com/vladikoff/grunt-devtools#updating-from-an-older-version).
-If issues still occur - [report it](https://github.com/vladikoff/grunt-devtools/issues) or ask for help in the  `#grunt` irc channel on Freenode
+If you experience any issues, perform an [update first](https://github.com/vladikoff/grunt-devtools#updating-from-an-older-version).
+If issues still occur - [report it](https://github.com/vladikoff/grunt-devtools/issues) or ask for help in the  `#grunt` irc channel on Freenode.
 
 See the [CHANGELOG](CHANGELOG) for release history .
 See the [contributing guide](CONTRIBUTING.md) for local development instructions.
