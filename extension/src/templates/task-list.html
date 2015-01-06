@@ -1,4 +1,4 @@
-<% _.each(buttons, function(task) { %>
+<% _(buttons).sortBy('name').each(function(task) { %>
 <li>
   <button class='task' value='<%= task.name %>'><%= task.name %></button>
   <button title='Set --verbose' class='b b-second b-flag b-verbose' value='-v'>V</button>
